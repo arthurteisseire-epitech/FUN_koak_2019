@@ -1,5 +1,26 @@
 module KoakAST where
 
+newtype KStmt =
+    KStmt [KDefs]
+    deriving (Show, Eq)
+
+data KDefs
+    = KDefs KPrototype KExpressions
+    | KExpressions KExpressions
+    deriving (Show, Eq)
+
+data KPrototype =
+    KPrototype KIdentifier KPrototypeArgs
+    deriving (Show, Eq) -- TODO : comprendre la grammaire pour compléter ce type (cf: sujet)
+
+data KPrototypeArgs =
+    KPrototypeArgs
+        { kArgName    :: KIdentifier
+        , kArgType    :: KType
+        , kReturnType :: KType
+        }
+    deriving (Show, Eq)
+
 data KExpressions
     = KFor
           { kForCounter    :: KIdentifier
@@ -23,9 +44,14 @@ data KExpressions
     | KListExpr [KExpression]
     deriving (Show, Eq)
 
-data KExpression = KExpression KUnary [KBinOpSuffix] deriving (Show, Eq)
+data KExpression =
+    KExpression KUnary [KBinOpSuffix]
+    deriving (Show, Eq)
 
-data KBinOpSuffix = KBinOpUnary KBinOp KUnary | KBinOpExpr KBinOp KExpression deriving (Show, Eq)
+data KBinOpSuffix
+    = KBinOpUnary KBinOp KUnary
+    | KBinOpExpr KBinOp KExpression
+    deriving (Show, Eq)
 
 data KUnary
     = KUnary KUnOp KUnary
@@ -37,12 +63,14 @@ data KPostfix
     | KFuncCall KPrimary KCallExpr
     deriving (Show, Eq)
 
-newtype KCallExpr = KArgs [KExpression] deriving (Show, Eq)
+newtype KCallExpr =
+    KArgs [KExpression]
+    deriving (Show, Eq)
 
 data KPrimary
     = KIdentifier KIdentifier
     | KLiteral KLiteral
-    | KExpressions KExpressions
+    | KPrimaryExpressions KExpressions
     deriving (Show, Eq)
 
 data KLiteral
@@ -50,8 +78,10 @@ data KLiteral
     | KInt Int
     deriving (Show, Eq, Ord)
 
-type KReturnType = String
-type KIdentifier = String
-type KBinOp = String
-type KUnOp = String
+type KType = String
 
+type KIdentifier = String
+
+type KBinOp = String
+
+type KUnOp = String
