@@ -9,4 +9,4 @@ main = hspec spec
 spec :: Spec
 spec = describe "test parser" $
     it "test parse int" $
-        KInt 2 `shouldBe` KInt 2
+        KDoubleConst 2 `shouldBe` KDoubleConst 2

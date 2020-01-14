@@ -74,8 +74,8 @@ data KPrimary
     deriving (Show, Eq)
 
 data KLiteral
-    = KDouble Double
-    | KInt Int
+    = KDecimalConst Double
+    | KDoubleConst Int
     deriving (Show, Eq, Ord)
 
 type KType = String
