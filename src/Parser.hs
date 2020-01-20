@@ -14,11 +14,14 @@ applyParser parser s
   where
     res = readP_to_S parser s
 
+parsePrimary :: ReadP KPrimary
+parsePrimary = (KIdentifier <$> parseIdentifier) <|> (KLiteral <$> parseLiteral) -- TODO : add '<|> expressionsParser'
+
 parseIdentifier :: ReadP KIdentifier
 parseIdentifier = satisfy isAlpha <:> munch isAlphaNum
 
-parseNumber :: ReadP KLiteral
-parseNumber = (KDoubleConst . rDouble <$> double) <|> (KDecimalConst . rInt <$> integer)
+parseLiteral :: ReadP KLiteral
+parseLiteral = (KDoubleConst . rDouble <$> double) <|> (KDecimalConst . rInt <$> integer)
   where
     rDouble = read :: String -> Double
     rInt = read :: String -> Int

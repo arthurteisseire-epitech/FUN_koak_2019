@@ -12,11 +12,11 @@ spec :: Spec
 spec = do
     describe "parse number" $ do
         it "test parse int" $
-            applyParser parseNumber "2" `shouldBe` Right (KDecimalConst 2)
+            applyParser parseLiteral "2" `shouldBe` (Right . KDecimalConst) 2
         it "test parse double" $
-            applyParser parseNumber "2.0" `shouldBe` Right (KDoubleConst 2)
+            applyParser parseLiteral "2.0" `shouldBe` (Right . KDoubleConst) 2
         it "test parse number error" $
-            applyParser parseNumber "error" `shouldSatisfy` isLeft
+            applyParser parseLiteral "error" `shouldSatisfy` isLeft
 
     describe "parse identifier" $ do
         it "test one char" $
@@ -27,3 +27,9 @@ spec = do
             applyParser parseIdentifier "id3entifier2" `shouldBe` Right "id3entifier2"
         it "test number first" $
             applyParser parseIdentifier "2id" `shouldSatisfy` isLeft
+
+    describe "parse primary" $ do
+        it "test identifier" $
+            applyParser parsePrimary "id" `shouldBe` (Right . KIdentifier) "id"
+        it "test literal" $
+            applyParser parsePrimary "2" `shouldBe` (Right . KLiteral . KDecimalConst) 2
