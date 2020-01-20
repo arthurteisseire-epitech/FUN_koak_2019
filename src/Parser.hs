@@ -7,13 +7,10 @@ import Control.Applicative ((<|>))
 
 applyParser :: ReadP a -> String -> Either String a
 applyParser parser s
-    | null res = Left errorMsg
+    | null res = Left "Any Error"
     | otherwise = Right . fst . last $ res
   where
     res = readP_to_S parser s
-
-errorMsg :: String
-errorMsg = "Any Error"
 
 parseNumber :: ReadP KLiteral
 parseNumber = (KDoubleConst . rDouble <$> double) <|> (KDecimalConst . rInt <$> integer)
