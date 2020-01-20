@@ -10,7 +10,7 @@ main = hspec spec
 
 spec :: Spec
 spec = do
-    describe "test parse number" $ do
+    describe "parse number" $ do
         it "test parse int" $
             applyParser parseNumber "2" `shouldBe` Right (KDecimalConst 2)
         it "test parse double" $
@@ -18,7 +18,9 @@ spec = do
         it "test parse number error" $
             applyParser parseNumber "error" `shouldSatisfy` isLeft
 
-    describe "test parse identifier" $ do
+    describe "parse identifier" $ do
+        it "test one char" $
+            applyParser parseIdentifier "a" `shouldBe` Right "a"
         it "test only alpha chars" $
             applyParser parseIdentifier "identifier" `shouldBe` Right "identifier"
         it "test numbers in identifier" $
