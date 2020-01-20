@@ -13,3 +13,5 @@ spec = describe "test parser" $ do
         applyParser parseNumber "2" `shouldBe` Right (KDecimalConst 2)
     it "test parse double" $
         applyParser parseNumber "2.0" `shouldBe` Right (KDoubleConst 2)
+    it "test parse number error" $
+        applyParser parseNumber "error" `shouldBe` Left errorMsg
