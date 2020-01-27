@@ -45,12 +45,7 @@ data KExpressions
     deriving (Show, Eq)
 
 data KExpression =
-    KExpression KUnary [KBinOpSuffix]
-    deriving (Show, Eq)
-
-data KBinOpSuffix
-    = KBinOpUnary KBinOp KUnary
-    | KBinOpExpr KBinOp KExpression
+    KExpression KUnary (Maybe (KBinOp, KExpression))
     deriving (Show, Eq)
 
 data KUnary

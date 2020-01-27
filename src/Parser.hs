@@ -1,6 +1,6 @@
 module Parser where
 
-import           Control.Applicative          ((<|>))
+import           Control.Applicative          (liftA2, (<|>))
 import           Control.Monad
 import           Data.Char
 import           KoakAST
@@ -13,6 +13,18 @@ applyParser parser s
     | otherwise = Right . fst . last $ res
   where
     res = readP_to_S parser s
+
+parseExpression :: ReadP KExpression
+parseExpression = do
+    u <- parseUnary
+    m <- option Nothing parseExpressionSuffix
+    return (KExpression u m)
+
+parseExpressionSuffix :: ReadP (Maybe (KBinOp, KExpression)) 
+parseExpressionSuffix = do
+    c <- oneOf "+-*/"
+    e <- parseExpression
+    (pure . Just) ([c], e)
 
 parseUnary :: ReadP KUnary
 parseUnary =

@@ -41,3 +41,13 @@ spec = do
     describe "parse unary" $
         it "test unary" $
             applyParser parseUnary "!toto" `shouldBe` Right (KUnary "!" ((KPostfix . KPrimary . KIdentifier) "toto"))
+
+    describe "parse expression" $ do
+        it "test expression" $
+            applyParser parseExpression "2" `shouldBe` Right (KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) Nothing)
+        it "test expression" $
+            applyParser parseExpression "2+3"
+            `shouldBe`
+            Right 
+                (KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
+                (Just ("+", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3) Nothing)))
