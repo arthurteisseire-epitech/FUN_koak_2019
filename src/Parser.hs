@@ -1,11 +1,11 @@
 module Parser where
 
-import KoakAST
-import Text.ParserCombinators.ReadP
-import ParseUtils
-import Control.Applicative ((<|>))
-import Control.Monad
-import Data.Char
+import           Control.Applicative          ((<|>))
+import           Control.Monad
+import           Data.Char
+import           KoakAST
+import           ParseUtils
+import           Text.ParserCombinators.ReadP
 
 applyParser :: ReadP a -> String -> Either String a
 applyParser parser s
@@ -13,6 +13,14 @@ applyParser parser s
     | otherwise = Right . fst . last $ res
   where
     res = readP_to_S parser s
+
+parseUnary :: ReadP KUnary
+parseUnary =
+    (do u <- oneOf unOp
+        KUnary [u] <$> parseUnary) <|>
+    (KPostfix <$> parsePostfix)
+  where
+    unOp = "!-"
 
 parsePostfix :: ReadP KPostfix
 parsePostfix = KPrimary <$> parsePrimary -- TODO : add 'call_expr?'

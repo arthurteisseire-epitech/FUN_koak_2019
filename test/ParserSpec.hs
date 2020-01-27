@@ -37,3 +37,7 @@ spec = do
     describe "parse postfix" $
         it "test primary without call_expr" $
             applyParser parsePostfix "toto" `shouldBe` (Right . KPrimary . KIdentifier) "toto"
+
+    describe "parse unary" $
+        it "test unary" $
+            applyParser parseUnary "!toto" `shouldBe` Right (KUnary "!" ((KPostfix . KPrimary . KIdentifier) "toto"))
