@@ -15,7 +15,7 @@ applyParser parser s
     res = readP_to_S parser s
 
 parsePostfix :: ReadP KPostfix
-parsePostfix = KPrimary <$> parsePrimary
+parsePostfix = KPrimary <$> parsePrimary -- TODO : add 'call_expr?'
 
 parsePrimary :: ReadP KPrimary
 parsePrimary = (KIdentifier <$> parseIdentifier) <|> (KLiteral <$> parseLiteral) -- TODO : add '<|> expressionsParser'
