@@ -24,7 +24,7 @@ parseExpressionSuffix :: ReadP (Maybe (KBinOp, KExpression))
 parseExpressionSuffix = do
     c <- oneOf "+-*/"
     e <- parseExpression
-    (pure . Just) ([c], e)
+    (return . Just) ([c], e)
 
 parseUnary :: ReadP KUnary
 parseUnary =
