@@ -20,7 +20,7 @@ parseExpression = do
     m <- option Nothing parseExpressionSuffix
     return (KExpression u m)
 
-parseExpressionSuffix :: ReadP (Maybe (KBinOp, KExpression)) 
+parseExpressionSuffix :: ReadP (Maybe (KBinOp, KExpression))
 parseExpressionSuffix = do
     c <- oneOf "+-*/"
     e <- parseExpression
@@ -28,11 +28,9 @@ parseExpressionSuffix = do
 
 parseUnary :: ReadP KUnary
 parseUnary =
-    (do u <- oneOf unOp
+    (do u <- oneOf "!-"
         KUnary [u] <$> parseUnary) <|>
     (KPostfix <$> parsePostfix)
-  where
-    unOp = "!-"
 
 parsePostfix :: ReadP KPostfix
 parsePostfix = KPrimary <$> parsePrimary -- TODO : add 'call_expr?'
