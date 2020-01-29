@@ -59,7 +59,7 @@ data KPostfix
     deriving (Show, Eq)
 
 newtype KCallExpr =
-    KArgs [KExpression]
+    KCallExpr [KExpression]
     deriving (Show, Eq)
 
 data KPrimary

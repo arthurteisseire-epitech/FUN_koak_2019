@@ -1,6 +1,6 @@
 module Parser where
 
-import           Control.Applicative          (liftA2, (<|>))
+import           Control.Applicative          (liftA2, (<|>), Alternative)
 import           Control.Monad
 import           Data.Char
 import           KoakAST
@@ -35,6 +35,21 @@ parseUnary =
 parsePostfix :: ReadP KPostfix
 parsePostfix = KPrimary <$> parsePrimary -- TODO : add 'call_expr?'
 
+parseCallExpr :: ReadP KCallExpr
+parseCallExpr = do
+    char '('
+    expr <- parseExpression
+    expressions <- option [] parseCallExprSuffix
+    char ')'
+    return . KCallExpr $ expr : expressions
+
+parseCallExprSuffix :: ReadP [KExpression]
+parseCallExprSuffix = do
+    char ','
+    expr <- parseExpression
+    p <- option [] parseCallExprSuffix
+    return $ expr : p
+
 parsePrimary :: ReadP KPrimary
 parsePrimary = (KIdentifier <$> parseIdentifier) <|> (KLiteral <$> parseLiteral) -- TODO : add '<|> expressionsParser'
 
@@ -46,3 +61,12 @@ parseLiteral = (KDoubleConst . rDouble <$> double) <|> (KDecimalConst . rInt <$>
   where
     rDouble = read :: String -> Double
     rInt = read :: String -> Int
+
+star :: (Monad m, Alternative m) => m (a -> a) -> m (a -> a)
+star = composeUntilFail
+
+composeUntilFail :: (Monad m, Alternative m) => m (a -> a) -> m (a -> a)
+composeUntilFail m = do
+    g <- m
+    f <- composeUntilFail m <|> return id
+    return (f . g)

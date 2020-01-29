@@ -24,7 +24,7 @@ minus = char '-' <:> number
 (<++>) :: ReadP String -> ReadP String -> ReadP String
 (<++>) = liftA2 (++)
 
-(<:>) :: ReadP Char -> ReadP String -> ReadP String
+(<:>) :: ReadP a -> ReadP [a] -> ReadP [a]
 (<:>) a b = fmap (:) a <*> b
 
 oneOf :: String -> ReadP Char
