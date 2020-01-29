@@ -57,7 +57,7 @@ spec = do
                 (KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
                 (Just ("+", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3) Nothing)))
 
-        it "test expression is right recursive" $
+        it "test double nested expression" $
             applyParser parseExpression "2-3-4"
             `shouldBe`
             Right 
