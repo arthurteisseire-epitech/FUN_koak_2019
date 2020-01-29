@@ -29,7 +29,7 @@ parseExpressionSuffix = do
 parseUnary :: ReadP KUnary
 parseUnary =
     (do u <- oneOf "!-"
-        KUnary [u] <$> parseUnary) <|>
+        KUnOpUnary [u] <$> parseUnary) <|>
     (KPostfix <$> parsePostfix)
 
 parsePostfix :: ReadP KPostfix

@@ -44,14 +44,24 @@ spec = do
 
     describe "parse unary" $
         it "test unary" $
-            applyParser parseUnary "!toto" `shouldBe` Right (KUnary "!" ((KPostfix . KPrimary . KIdentifier) "toto"))
+            applyParser parseUnary "!toto" `shouldBe` Right (KUnOpUnary "!" ((KPostfix . KPrimary . KIdentifier) "toto"))
 
     describe "parse expression" $ do
         it "test expression" $
             applyParser parseExpression "2" `shouldBe` Right (KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) Nothing)
-        it "test expression" $
+
+        it "test nested expression" $
             applyParser parseExpression "2+3"
             `shouldBe`
-            Right 
+            Right
                 (KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
                 (Just ("+", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3) Nothing)))
+
+        it "test expression is right recursive" $
+            applyParser parseExpression "2-3-4"
+            `shouldBe`
+            Right 
+                (KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) $
+                    Just ("-", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3) $
+                        Just ("-", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4)
+                            Nothing)))

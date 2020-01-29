@@ -49,7 +49,7 @@ data KExpression =
     deriving (Show, Eq)
 
 data KUnary
-    = KUnary KUnOp KUnary
+    = KUnOpUnary KUnOp KUnary
     | KPostfix KPostfix
     deriving (Show, Eq)
 
