@@ -61,12 +61,3 @@ parseLiteral = (KDoubleConst . rDouble <$> double) <|> (KDecimalConst . rInt <$>
   where
     rDouble = read :: String -> Double
     rInt = read :: String -> Int
-
-star :: (Monad m, Alternative m) => m (a -> a) -> m (a -> a)
-star = composeUntilFail
-
-composeUntilFail :: (Monad m, Alternative m) => m (a -> a) -> m (a -> a)
-composeUntilFail m = do
-    g <- m
-    f <- composeUntilFail m <|> return id
-    return (f . g)
