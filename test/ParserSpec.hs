@@ -34,9 +34,13 @@ spec = do
         it "test literal" $
             applyParser parsePrimary "2" `shouldBe` (Right . KLiteral . KDecimalConst) 2
 
-    describe "parse postfix" $
-        it "test primary without call_expr" $
+    describe "parse postfix" $ do
+        it "test primary identifier" $
             applyParser parsePostfix "toto" `shouldBe` (Right . KPrimary . KIdentifier) "toto"
+        it "test primary decimal const" $
+            applyParser parsePostfix "2" `shouldBe` (Right . KPrimary . KLiteral . KDecimalConst) 2
+        it "test primary double" $
+            applyParser parsePostfix "2.0" `shouldBe` (Right . KPrimary . KLiteral . KDoubleConst) 2
 
     describe "parse unary" $
         it "test unary" $
