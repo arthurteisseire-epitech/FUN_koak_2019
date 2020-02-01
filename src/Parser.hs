@@ -1,6 +1,6 @@
 module Parser where
 
-import           Control.Applicative          (liftA2, (<|>), Alternative)
+import           Control.Applicative          (Alternative, liftA2, (<|>))
 import           Control.Monad
 import           Data.Char
 import           KoakAST
@@ -13,6 +13,22 @@ applyParser parser s
     | otherwise = Right . fst . last $ res
   where
     res = readP_to_S parser s
+
+parseExpressions :: ReadP KExpressions
+parseExpressions = parseListExpr -- TODO : Add '<|> parseFor <|> parseIf <|> parseWhile'
+
+parseListExpr :: ReadP KExpressions
+parseListExpr = do
+    e <- parseExpression
+    (KListExpr suffix) <- option (KListExpr []) parseListExprSuffix
+    return $ KListExpr (e : suffix)
+
+parseListExprSuffix :: ReadP KExpressions
+parseListExprSuffix = do
+    char ':'
+    e <- parseExpression
+    (KListExpr s) <- option (KListExpr []) parseListExprSuffix
+    return $ KListExpr (e : s)
 
 parseExpression :: ReadP KExpression
 parseExpression = do

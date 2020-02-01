@@ -97,3 +97,25 @@ spec = do
                     Just ("-", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3) $
                         Just ("-", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4)
                             Nothing)))
+
+    describe "parse expressions" $ do
+        it "test simple expression" $
+            applyParser parseListExpr "2+3"
+            `shouldBe`
+            Right
+                (KListExpr
+                    [KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
+                    (Just ("+", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3) Nothing))])
+
+        it "test expressions separated by two points" $
+            applyParser parseListExpr "2+3:4-5:6*7"
+            `shouldBe`
+            Right
+                (KListExpr
+                    [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
+                      (Just ("+", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3) Nothing))
+                    , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4)
+                      (Just ("-", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 5) Nothing))
+                    , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 6)
+                      (Just ("*", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 7) Nothing))
+                    ])
