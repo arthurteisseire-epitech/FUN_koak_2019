@@ -41,6 +41,14 @@ spec = do
             applyParser parsePostfix "2" `shouldBe` (Right . KPrimary . KLiteral . KDecimalConst) 2
         it "test primary double" $
             applyParser parsePostfix "2.0" `shouldBe` (Right . KPrimary . KLiteral . KDoubleConst) 2
+        it "test call expr" $
+            applyParser parsePostfix "toto(1,2)"
+            `shouldBe`
+            Right (KFuncCall
+                (KIdentifier "toto")
+                (KCallExpr [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) Nothing
+                           , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) Nothing
+                           ]))
 
     describe "parse call expr" $ do
         it "test call expr with one args" $

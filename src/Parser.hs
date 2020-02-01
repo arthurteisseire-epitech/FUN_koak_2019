@@ -33,7 +33,9 @@ parseUnary =
     (KPostfix <$> parsePostfix)
 
 parsePostfix :: ReadP KPostfix
-parsePostfix = KPrimary <$> parsePrimary -- TODO : add 'call_expr?'
+parsePostfix = do
+    p <- parsePrimary
+    (KFuncCall p <$> parseCallExpr) <|> return (KPrimary p)
 
 parseCallExpr :: ReadP KCallExpr
 parseCallExpr = do
