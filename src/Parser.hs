@@ -69,7 +69,12 @@ parseCallExprSuffix = do
     return $ expr : p
 
 parsePrimary :: ReadP KPrimary
-parsePrimary = (KIdentifier <$> parseIdentifier) <|> (KLiteral <$> parseLiteral) -- TODO : add '<|> expressionsParser'
+parsePrimary =
+    (KIdentifier <$> parseIdentifier) <|> (KLiteral <$> parseLiteral) <|>
+    (do char '('
+        exprs <- parseExpressions
+        char ')'
+        return (KPrimaryExpressions exprs))
 
 parseIdentifier :: ReadP KIdentifier
 parseIdentifier = satisfy isAlpha <:> munch isAlphaNum
