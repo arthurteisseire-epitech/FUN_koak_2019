@@ -45,7 +45,7 @@ data KExpressions
     deriving (Show, Eq)
 
 data KExpression =
-    KExpression KUnary (Maybe (KBinOp, KExpression))
+    KExpression KUnary [(KBinOp, KUnary)]
     deriving (Show, Eq)
 
 data KUnary

@@ -36,15 +36,18 @@ spec = do
         it "test expressions" $
             applyParser parsePrimary "(2+3:4-5:6*7)"
             `shouldBe`
-            Right
-                (KPrimaryExpressions $ KListExpr
-                    [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
-                      (Just ("+", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3) Nothing))
-                    , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4)
-                      (Just ("-", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 5) Nothing))
-                    , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 6)
-                      (Just ("*", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 7) Nothing))
-                    ])
+            (Right $ KPrimaryExpressions
+                (KListExpr
+                    [ KExpression
+                        ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
+                        [ ("+", (KPostfix . KPrimary . KLiteral . KDecimalConst) 3) ]
+                    , KExpression
+                        ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4)
+                        [ ("-", (KPostfix . KPrimary . KLiteral . KDecimalConst) 5) ]
+                    , KExpression
+                        ((KPostfix . KPrimary . KLiteral . KDecimalConst) 6)
+                        [ ("*", (KPostfix . KPrimary . KLiteral . KDecimalConst) 7) ]
+                    ]))
 
     describe "parse postfix" $ do
         it "test primary identifier" $
@@ -58,8 +61,8 @@ spec = do
             `shouldBe`
             Right (KFuncCall
                 (KIdentifier "toto")
-                (KCallExpr [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) Nothing
-                           , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) Nothing
+                (KCallExpr [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) []
+                           , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) []
                            ]))
 
     describe "parse call expr" $ do
@@ -67,23 +70,23 @@ spec = do
             applyParser parseCallExpr "(1)"
             `shouldBe`
             Right
-                (KCallExpr [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) Nothing ])
+                (KCallExpr [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) [] ])
 
         it "test call expr with two args" $
             applyParser parseCallExpr "(1,2)"
             `shouldBe`
             Right
-                (KCallExpr [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) Nothing
-                           , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) Nothing
+                (KCallExpr [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) []
+                           , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) []
                            ])
 
         it "test call expr with three args" $
             applyParser parseCallExpr "(1,2,3)"
             `shouldBe`
             Right
-                (KCallExpr [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) Nothing
-                           , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) Nothing
-                           , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3) Nothing
+                (KCallExpr [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) []
+                           , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) []
+                           , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3) []
                            ])
 
     describe "parse unary" $
@@ -92,23 +95,25 @@ spec = do
 
     describe "parse expression" $ do
         it "test expression" $
-            applyParser parseExpression "2" `shouldBe` Right (KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) Nothing)
+            applyParser parseExpression "2" `shouldBe` Right (KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) [])
 
         it "test nested expression" $
             applyParser parseExpression "2+3"
             `shouldBe`
             Right
-                (KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
-                (Just ("+", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3) Nothing)))
+                (KExpression
+                    ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
+                    [("+", (KPostfix . KPrimary . KLiteral . KDecimalConst) 3)])
 
         it "test double nested expression" $
             applyParser parseExpression "2-3-4"
             `shouldBe`
             Right
-                (KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) $
-                    Just ("-", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3) $
-                        Just ("-", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4)
-                            Nothing)))
+                (KExpression
+                    ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
+                    [ ("-", (KPostfix . KPrimary . KLiteral . KDecimalConst) 3)
+                    , ("-", (KPostfix . KPrimary . KLiteral . KDecimalConst) 4)
+                    ])
 
     describe "parse expressions" $ do
         it "test simple expression" $
@@ -116,20 +121,25 @@ spec = do
             `shouldBe`
             Right
                 (KListExpr
-                    [KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
-                    (Just ("+", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3) Nothing))])
+                    [ KExpression
+                        ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
+                        [ ("+", (KPostfix . KPrimary . KLiteral . KDecimalConst) 3) ]
+                    ])
 
         it "test expressions separated by two points" $
             applyParser parseListExpr "2+3:4-5:6*7"
             `shouldBe`
             Right
                 (KListExpr
-                    [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
-                      (Just ("+", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3) Nothing))
-                    , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4)
-                      (Just ("-", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 5) Nothing))
-                    , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 6)
-                      (Just ("*", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 7) Nothing))
+                    [ KExpression
+                        ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
+                        [ ("+", (KPostfix . KPrimary . KLiteral . KDecimalConst) 3) ]
+                    , KExpression
+                        ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4)
+                        [ ("-", (KPostfix . KPrimary . KLiteral . KDecimalConst) 5) ]
+                    , KExpression
+                        ((KPostfix . KPrimary . KLiteral . KDecimalConst) 6)
+                        [ ("*", (KPostfix . KPrimary . KLiteral . KDecimalConst) 7) ]
                     ])
 
     describe "parse type" $ do
@@ -145,7 +155,7 @@ spec = do
             applyParser parsePrototypeArg "num:int" `shouldBe` Right (KPrototypeArg "num" KIntType)
         it "test double arg" $
             applyParser parsePrototypeArg "n:double" `shouldBe` Right (KPrototypeArg "n" KDoubleType)
-    
+
     describe "parse prototype args" $ do
         it "test with no argument" $
             applyParser parsePrototypeArgs "():double"
