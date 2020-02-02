@@ -117,28 +117,17 @@ spec = do
         it "test simple expression" $
             applyParser parseListExpr "2+3"
             `shouldBe`
-            Right
-                (KListExpr
-                    [ KExpression
-                        ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
-                        [ (KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 3) ]
-                    ])
+            Right (KListExpr (rights [ applyParser parseExpression "2+3" ]))
 
         it "test expressions separated by two points" $
             applyParser parseListExpr "2+3:4-5:6*7"
             `shouldBe`
             Right
-                (KListExpr
-                    [ KExpression
-                        ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
-                        [ (KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 3) ]
-                    , KExpression
-                        ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4)
-                        [ (KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 5) ]
-                    , KExpression
-                        ((KPostfix . KPrimary . KLiteral . KDecimalConst) 6)
-                        [ (KBinOpMul, (KPostfix . KPrimary . KLiteral . KDecimalConst) 7) ]
-                    ])
+                (KListExpr (rights
+                    [ applyParser parseExpression "2+3"
+                    , applyParser parseExpression "4-5"
+                    , applyParser parseExpression "6*7"
+                    ]))
 
     describe "parse type" $ do
         it "test parse int type" $
