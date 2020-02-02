@@ -14,8 +14,13 @@ applyParser parser s
   where
     res = readP_to_S parser s
 
+parseStmt :: ReadP KStmt
+parseStmt = do
+    stmt <- sepBy parseKDefs (char ' ')
+    return $ KStmt stmt
+
 parseKDefs :: ReadP KDefs
-parseKDefs = (string "def " *> parseDefs) <|> (KExpressions <$> parseExpressions <* char ';')
+parseKDefs = (string "def " *> parseDefs <* char ';') <|> (KExpressions <$> parseExpressions <* char ';')
 
 parseDefs :: ReadP KDefs
 parseDefs = do

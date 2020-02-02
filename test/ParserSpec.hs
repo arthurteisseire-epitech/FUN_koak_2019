@@ -227,7 +227,7 @@ spec = do
 
     describe "parse kdefs" $ do
         it "test definition" $
-            applyParser parseKDefs "def add():int 2+3" `shouldBe` applyParser parseDefs "add():int 2+3"
+            applyParser parseKDefs "def add():int 2+3;" `shouldBe` applyParser parseDefs "add():int 2+3"
 
         it "test expressions" $
             applyParser parseKDefs "2+3+4;" `shouldBe` KExpressions <$> applyParser parseExpressions "2+3+4"
@@ -237,4 +237,20 @@ spec = do
             
         it "test expressions fail" $
             applyParser parseKDefs "2+3+4" `shouldSatisfy` isLeft
-            
+    
+    describe "parse statement" $ do
+        it "test one kdefs" $
+            applyParser parseStmt "def add():int 2+3;"
+            `shouldBe`
+            (Right $ KStmt (rights [ applyParser parseKDefs "def add():int 2+3;" ]))
+
+        it "test multiple kdefs" $
+            applyParser parseStmt "def add():int 2+3; def mul(num1:int num2:int):int num1*num2; 3+3; add();"
+            `shouldBe`
+            (Right $ KStmt (rights [ applyParser parseKDefs "def add():int 2+3;"
+                                   , applyParser parseKDefs "def mul(num1:int num2:int):int num1*num2;"
+                                   , applyParser parseKDefs "3+3;"
+                                   , applyParser parseKDefs "add();"
+                                   ]))
+
+                    
