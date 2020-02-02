@@ -43,16 +43,8 @@ parseListExpr = KListExpr <$> sepBy1 parseExpression (char ':')
 
 parseExpression :: ReadP KExpression
 parseExpression = do
-    u <- parseUnary
-    m <- option [] parseExpressionSuffix
+    (u, m) <- sepByPair parseUnary parseBinOp
     return (KExpression u m)
-
-parseExpressionSuffix :: ReadP [(KBinOp, KUnary)]
-parseExpressionSuffix = do
-    c <- parseBinOp
-    u <- parseUnary
-    e <- option [] parseExpressionSuffix
-    return $ (c, u) : e
 
 parseUnary :: ReadP KUnary
 parseUnary =

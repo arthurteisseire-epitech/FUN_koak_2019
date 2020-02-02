@@ -1,6 +1,7 @@
 module ParseUtils where
 
-import           Control.Applicative
+import           Control.Applicative          ((<|>), liftA2)
+import           Control.Monad                (liftM2)
 import           Data.Char
 import           Text.ParserCombinators.ReadP
 
@@ -29,3 +30,16 @@ minus = char '-' <:> number
 
 oneOf :: String -> ReadP Char
 oneOf s = satisfy (`elem` s)
+
+sepByPair :: ReadP a -> ReadP sep -> ReadP (a, [(sep, a)])
+sepByPair parser sep = do
+    p <- parser
+    h <- sepByPairHelper parser sep <|> return []
+    return (p, h)
+
+sepByPairHelper :: ReadP a -> ReadP sep -> ReadP [(sep, a)]
+sepByPairHelper parser sep = do
+    s <- sep
+    p <- parser
+    e <- (sepByPairHelper parser sep) <|> return []
+    return $ (s, p) : e
