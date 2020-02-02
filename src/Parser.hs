@@ -49,10 +49,10 @@ parseExpression = do
 
 parseExpressionSuffix :: ReadP [(KBinOp, KUnary)]
 parseExpressionSuffix = do
-    c <- oneOf "+-*/"
+    c <- parseBinOp
     u <- parseUnary
     e <- option [] parseExpressionSuffix
-    return $ ([c], u) : e
+    return $ (c, u) : e
 
 parseUnary :: ReadP KUnary
 parseUnary =
@@ -85,6 +85,12 @@ parseIdentifier = satisfy isAlpha <:> munch isAlphaNum
 
 parseLiteral :: ReadP KLiteral
 parseLiteral = (KDoubleConst . readDouble <$> double) <|> (KDecimalConst . readInt <$> integer)
+
+parseBinOp :: ReadP KBinOp
+parseBinOp = (string "+" >> return KBinOpPlus) <|>
+             (string "-" >> return KBinOpLess) <|>
+             (string "*" >> return KBinOpMul) <|>
+             (string "/" >> return KBinOpDiv)
 
 readInt :: String -> Int
 readInt = read

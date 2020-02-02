@@ -10,6 +10,10 @@ main = hspec spec
 
 spec :: Spec
 spec = do
+    describe "parse binary operator" $
+        it "test plus" $
+            applyParser parseBinOp "+" `shouldBe` Right KBinOpPlus
+
     describe "parse number" $ do
         it "test parse int" $
             applyParser parseLiteral "2" `shouldBe` (Right . KDecimalConst) 2
@@ -40,13 +44,13 @@ spec = do
                 (KListExpr
                     [ KExpression
                         ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
-                        [ ("+", (KPostfix . KPrimary . KLiteral . KDecimalConst) 3) ]
+                        [ (KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 3) ]
                     , KExpression
                         ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4)
-                        [ ("-", (KPostfix . KPrimary . KLiteral . KDecimalConst) 5) ]
+                        [ (KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 5) ]
                     , KExpression
                         ((KPostfix . KPrimary . KLiteral . KDecimalConst) 6)
-                        [ ("*", (KPostfix . KPrimary . KLiteral . KDecimalConst) 7) ]
+                        [ (KBinOpMul, (KPostfix . KPrimary . KLiteral . KDecimalConst) 7) ]
                     ]))
 
     describe "parse postfix" $ do
@@ -103,7 +107,7 @@ spec = do
             Right
                 (KExpression
                     ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
-                    [("+", (KPostfix . KPrimary . KLiteral . KDecimalConst) 3)])
+                    [(KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 3)])
 
         it "test double nested expression" $
             applyParser parseExpression "2-3-4"
@@ -111,8 +115,8 @@ spec = do
             Right
                 (KExpression
                     ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
-                    [ ("-", (KPostfix . KPrimary . KLiteral . KDecimalConst) 3)
-                    , ("-", (KPostfix . KPrimary . KLiteral . KDecimalConst) 4)
+                    [ (KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 3)
+                    , (KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 4)
                     ])
 
     describe "parse expressions" $ do
@@ -123,7 +127,7 @@ spec = do
                 (KListExpr
                     [ KExpression
                         ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
-                        [ ("+", (KPostfix . KPrimary . KLiteral . KDecimalConst) 3) ]
+                        [ (KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 3) ]
                     ])
 
         it "test expressions separated by two points" $
@@ -133,13 +137,13 @@ spec = do
                 (KListExpr
                     [ KExpression
                         ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
-                        [ ("+", (KPostfix . KPrimary . KLiteral . KDecimalConst) 3) ]
+                        [ (KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 3) ]
                     , KExpression
                         ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4)
-                        [ ("-", (KPostfix . KPrimary . KLiteral . KDecimalConst) 5) ]
+                        [ (KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 5) ]
                     , KExpression
                         ((KPostfix . KPrimary . KLiteral . KDecimalConst) 6)
-                        [ ("*", (KPostfix . KPrimary . KLiteral . KDecimalConst) 7) ]
+                        [ (KBinOpMul, (KPostfix . KPrimary . KLiteral . KDecimalConst) 7) ]
                     ])
 
     describe "parse type" $ do

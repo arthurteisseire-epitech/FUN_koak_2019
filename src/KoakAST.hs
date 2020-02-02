@@ -79,8 +79,18 @@ data KType
     | KVoidType
     deriving (Show, Eq)
 
-type KIdentifier = String
+data KBinOp
+    = KBinOpPlus
+    | KBinOpLess
+    | KBinOpMul
+    | KBinOpDiv
+    deriving (Show, Eq)
 
-type KBinOp = String
+--data KUnOp
+--    = KUnOpNot
+--    | KUnOpLess
+--    deriving (Show, Eq)
+
+type KIdentifier = String
 
 type KUnOp = String
