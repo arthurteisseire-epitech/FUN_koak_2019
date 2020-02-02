@@ -77,17 +77,9 @@ parsePostfix = do
 parseCallExpr :: ReadP KCallExpr
 parseCallExpr = do
     char '('
-    expr <- parseExpression
-    expressions <- option [] parseCallExprSuffix
+    expressions <- sepBy1 parseExpression (char ',')
     char ')'
-    return . KCallExpr $ expr : expressions
-
-parseCallExprSuffix :: ReadP [KExpression]
-parseCallExprSuffix = do
-    char ','
-    expr <- parseExpression
-    p <- option [] parseCallExprSuffix
-    return $ expr : p
+    return . KCallExpr $ expressions
 
 parsePrimary :: ReadP KPrimary
 parsePrimary =
