@@ -15,8 +15,7 @@ applyParser parser s
     res = readP_to_S parser s
 
 parseKDefs :: ReadP KDefs
-parseKDefs =
-    (string "def " *> parseDefs) <|> (KExpressions <$> parseExpressions <* char ';')
+parseKDefs = (string "def " *> parseDefs) <|> (KExpressions <$> parseExpressions <* char ';')
 
 parseDefs :: ReadP KDefs
 parseDefs = do
