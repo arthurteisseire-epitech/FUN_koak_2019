@@ -224,3 +224,17 @@ spec = do
                                 ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
                                 [ (KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 3) ]
                             ]))
+
+    describe "parse kdefs" $ do
+        it "test definition" $
+            applyParser parseKDefs "def add():int 2+3" `shouldBe` applyParser parseDefs "add():int 2+3"
+
+        it "test expressions" $
+            applyParser parseKDefs "2+3+4;" `shouldBe` KExpressions <$> applyParser parseExpressions "2+3+4"
+
+        it "test definition fail" $
+            applyParser parseKDefs "DEF 2+3+4;" `shouldSatisfy` isLeft
+            
+        it "test expressions fail" $
+            applyParser parseKDefs "2+3+4" `shouldSatisfy` isLeft
+            

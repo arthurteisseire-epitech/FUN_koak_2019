@@ -14,6 +14,10 @@ applyParser parser s
   where
     res = readP_to_S parser s
 
+parseKDefs :: ReadP KDefs
+parseKDefs =
+    (string "def " *> parseDefs) <|> (KExpressions <$> parseExpressions <* char ';')
+
 parseDefs :: ReadP KDefs
 parseDefs = do
     prototype <- parsePrototype
@@ -92,14 +96,12 @@ parseLiteral :: ReadP KLiteral
 parseLiteral = (KDoubleConst . readDouble <$> double) <|> (KDecimalConst . readInt <$> integer)
 
 parseBinOp :: ReadP KBinOp
-parseBinOp = (string "+" >> return KBinOpPlus) <|>
-             (string "-" >> return KBinOpLess) <|>
-             (string "*" >> return KBinOpMul) <|>
-             (string "/" >> return KBinOpDiv)
+parseBinOp =
+    (string "+" >> return KBinOpPlus) <|> (string "-" >> return KBinOpLess) <|> (string "*" >> return KBinOpMul) <|>
+    (string "/" >> return KBinOpDiv)
 
 parseUnOp :: ReadP KUnOp
-parseUnOp = (string "!" >> return KUnOpNot) <|>
-            (string "-" >> return KUnOpLess)
+parseUnOp = (string "!" >> return KUnOpNot) <|> (string "-" >> return KUnOpLess)
 
 readInt :: String -> Int
 readInt = read
