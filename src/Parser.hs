@@ -1,6 +1,6 @@
 module Parser where
 
-import           Control.Applicative          (Alternative, liftA2, (<|>))
+import           Control.Applicative          (Alternative, (<|>))
 import           Control.Monad
 import           Data.Char
 import           KoakAST
@@ -13,6 +13,12 @@ applyParser parser s
     | otherwise = Right . fst . last $ res
   where
     res = readP_to_S parser s
+
+parseType :: ReadP KType
+parseType =
+    (string "int" >> return KIntType) <|>
+    (string "double" >> return KDoubleType) <|>
+    (string "void" >> return KVoidType)
 
 parseExpressions :: ReadP KExpressions
 parseExpressions = parseListExpr -- TODO : Add '<|> parseFor <|> parseIf <|> parseWhile'
@@ -80,7 +86,10 @@ parseIdentifier :: ReadP KIdentifier
 parseIdentifier = satisfy isAlpha <:> munch isAlphaNum
 
 parseLiteral :: ReadP KLiteral
-parseLiteral = (KDoubleConst . rDouble <$> double) <|> (KDecimalConst . rInt <$> integer)
-  where
-    rDouble = read :: String -> Double
-    rInt = read :: String -> Int
+parseLiteral = (KDoubleConst . readDouble <$> double) <|> (KDecimalConst . readInt <$> integer)
+
+readInt :: String -> Int
+readInt = read
+
+readDouble :: String -> Double
+readDouble = read

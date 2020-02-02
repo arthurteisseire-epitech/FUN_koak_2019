@@ -73,10 +73,13 @@ data KLiteral
     | KDoubleConst Double
     deriving (Show, Eq, Ord)
 
-type KType = String
+data KType
+    = KIntType
+    | KDoubleType
+    | KVoidType
+    deriving (Show, Eq)
 
 type KIdentifier = String
 
 type KBinOp = String
-
 type KUnOp = String

@@ -131,3 +131,11 @@ spec = do
                     , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 6)
                       (Just ("*", KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 7) Nothing))
                     ])
+
+    describe "parse type" $ do
+        it "test parse int type" $
+            applyParser parseType "int" `shouldBe` Right KIntType
+        it "test parse double type" $
+            applyParser parseType "double" `shouldBe` Right KDoubleType
+        it "test parse double type" $
+            applyParser parseType "void" `shouldBe` Right KVoidType
