@@ -10,9 +10,21 @@ main = hspec spec
 
 spec :: Spec
 spec = do
-    describe "parse binary operator" $
+    describe "parse binary operator" $ do
         it "test plus" $
             applyParser parseBinOp "+" `shouldBe` Right KBinOpPlus
+        it "test less" $
+            applyParser parseBinOp "-" `shouldBe` Right KBinOpLess
+        it "test mul" $
+            applyParser parseBinOp "*" `shouldBe` Right KBinOpMul
+        it "test div" $
+            applyParser parseBinOp "/" `shouldBe` Right KBinOpDiv
+
+    describe "parse unary operator" $ do
+        it "test not" $
+            applyParser parseUnOp "!" `shouldBe` Right KUnOpNot
+        it "test less" $
+            applyParser parseUnOp "-" `shouldBe` Right KUnOpLess
 
     describe "parse number" $ do
         it "test parse int" $
@@ -95,7 +107,7 @@ spec = do
 
     describe "parse unary" $
         it "test unary" $
-            applyParser parseUnary "!toto" `shouldBe` Right (KUnOpUnary "!" ((KPostfix . KPrimary . KIdentifier) "toto"))
+            applyParser parseUnary "!toto" `shouldBe` Right (KUnOpUnary KUnOpNot ((KPostfix . KPrimary . KIdentifier) "toto"))
 
     describe "parse expression" $ do
         it "test expression" $

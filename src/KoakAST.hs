@@ -86,11 +86,9 @@ data KBinOp
     | KBinOpDiv
     deriving (Show, Eq)
 
---data KUnOp
---    = KUnOpNot
---    | KUnOpLess
---    deriving (Show, Eq)
+data KUnOp
+    = KUnOpNot
+    | KUnOpLess
+    deriving (Show, Eq)
 
 type KIdentifier = String
-
-type KUnOp = String

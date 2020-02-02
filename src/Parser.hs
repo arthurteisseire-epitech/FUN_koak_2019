@@ -56,8 +56,8 @@ parseExpressionSuffix = do
 
 parseUnary :: ReadP KUnary
 parseUnary =
-    (do u <- oneOf "!-"
-        KUnOpUnary [u] <$> parseUnary) <|>
+    (do u <- parseUnOp
+        KUnOpUnary u <$> parseUnary) <|>
     (KPostfix <$> parsePostfix)
 
 parsePostfix :: ReadP KPostfix
@@ -91,6 +91,10 @@ parseBinOp = (string "+" >> return KBinOpPlus) <|>
              (string "-" >> return KBinOpLess) <|>
              (string "*" >> return KBinOpMul) <|>
              (string "/" >> return KBinOpDiv)
+
+parseUnOp :: ReadP KUnOp
+parseUnOp = (string "!" >> return KUnOpNot) <|>
+            (string "-" >> return KUnOpLess)
 
 readInt :: String -> Int
 readInt = read
