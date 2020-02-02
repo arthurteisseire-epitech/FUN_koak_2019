@@ -70,25 +70,22 @@ spec = do
         it "test call expr with one args" $
             applyParser parseCallExpr "(1)"
             `shouldBe`
-            Right
-                (KCallExpr [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) [] ])
+            Right (KCallExpr (rights [ applyParser parseExpression "1" ]))
 
         it "test call expr with two args" $
             applyParser parseCallExpr "(1,2)"
             `shouldBe`
-            Right
-                (KCallExpr [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) []
-                           , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) []
-                           ])
+            Right (KCallExpr (rights [ applyParser parseExpression "1"
+                                     , applyParser parseExpression "2"
+                                     ]))
 
         it "test call expr with three args" $
             applyParser parseCallExpr "(1,2,3)"
             `shouldBe`
-            Right
-                (KCallExpr [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) []
-                           , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) []
-                           , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3) []
-                           ])
+            Right (KCallExpr (rights [ applyParser parseExpression "1"
+                                     , applyParser parseExpression "2"
+                                     , applyParser parseExpression "3"
+                                     ]))
 
     describe "parse unary" $
         it "test unary" $
