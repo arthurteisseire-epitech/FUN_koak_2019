@@ -190,3 +190,12 @@ spec = do
                                   , KPrototypeArg "num2" KDoubleType
                                   , KPrototypeArg "num3" KIntType
                                   ] KDoubleType)
+
+    describe "parse prototype" $ do
+        it "test with multiple argument" $
+            applyParser parsePrototype "addAll(num:int num2:double num3:int):double"
+            `shouldBe`
+            (Right (KPrototype "addAll" (KPrototypeArgs [ KPrototypeArg "num" KIntType
+                                                        , KPrototypeArg "num2" KDoubleType
+                                                        , KPrototypeArg "num3" KIntType
+                                                        ] KDoubleType)))
