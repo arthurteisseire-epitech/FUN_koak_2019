@@ -145,3 +145,9 @@ spec = do
             applyParser parsePrototypeArg "num:int" `shouldBe` Right (KPrototypeArg "num" KIntType)
         it "test double arg" $
             applyParser parsePrototypeArg "n:double" `shouldBe` Right (KPrototypeArg "n" KDoubleType)
+    
+    describe "parse prototype args" $
+        it "test with one argument" $
+            applyParser parsePrototypeArgs "(num:int):double"
+            `shouldBe`
+            Right (KPrototypeArgs [KPrototypeArg "num" KIntType] KDoubleType)

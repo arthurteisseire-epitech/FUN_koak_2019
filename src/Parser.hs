@@ -14,12 +14,20 @@ applyParser parser s
   where
     res = readP_to_S parser s
 
+parsePrototypeArgs :: ReadP KPrototypeArgs
+parsePrototypeArgs = do
+    char '('
+    arg <- parsePrototypeArg
+    string "):"
+    returnType <- parseType
+    return $ KPrototypeArgs [arg] returnType
+
 parsePrototypeArg :: ReadP KPrototypeArg
 parsePrototypeArg = do
     identifier <- parseIdentifier
     char ':'
     argType <- parseType
-    return $ KPrototypeArg identifier argType 
+    return $ KPrototypeArg identifier argType
 
 parseType :: ReadP KType
 parseType =
