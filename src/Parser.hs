@@ -39,17 +39,7 @@ parseExpressions :: ReadP KExpressions
 parseExpressions = parseListExpr -- TODO : Add '<|> parseFor <|> parseIf <|> parseWhile'
 
 parseListExpr :: ReadP KExpressions
-parseListExpr = do
-    e <- parseExpression
-    (KListExpr suffix) <- option (KListExpr []) parseListExprSuffix
-    return $ KListExpr (e : suffix)
-
-parseListExprSuffix :: ReadP KExpressions
-parseListExprSuffix = do
-    char ':'
-    e <- parseExpression
-    (KListExpr s) <- option (KListExpr []) parseListExprSuffix
-    return $ KListExpr (e : s)
+parseListExpr = KListExpr <$> sepBy1 parseExpression (char ':')
 
 parseExpression :: ReadP KExpression
 parseExpression = do
