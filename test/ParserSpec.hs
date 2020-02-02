@@ -146,8 +146,21 @@ spec = do
         it "test double arg" $
             applyParser parsePrototypeArg "n:double" `shouldBe` Right (KPrototypeArg "n" KDoubleType)
     
-    describe "parse prototype args" $
+    describe "parse prototype args" $ do
+        it "test with no argument" $
+            applyParser parsePrototypeArgs "():double"
+            `shouldBe`
+            Right (KPrototypeArgs [] KDoubleType)
+
         it "test with one argument" $
             applyParser parsePrototypeArgs "(num:int):double"
             `shouldBe`
             Right (KPrototypeArgs [KPrototypeArg "num" KIntType] KDoubleType)
+
+        it "test with multiple argument" $
+            applyParser parsePrototypeArgs "(num:int num2:double num3:int):double"
+            `shouldBe`
+            Right (KPrototypeArgs [ KPrototypeArg "num" KIntType
+                                  , KPrototypeArg "num2" KDoubleType
+                                  , KPrototypeArg "num3" KIntType
+                                  ] KDoubleType)

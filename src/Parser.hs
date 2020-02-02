@@ -17,10 +17,10 @@ applyParser parser s
 parsePrototypeArgs :: ReadP KPrototypeArgs
 parsePrototypeArgs = do
     char '('
-    arg <- parsePrototypeArg
+    args <- sepBy parsePrototypeArg (char ' ')
     string "):"
     returnType <- parseType
-    return $ KPrototypeArgs [arg] returnType
+    return $ KPrototypeArgs args returnType
 
 parsePrototypeArg :: ReadP KPrototypeArg
 parsePrototypeArg = do
