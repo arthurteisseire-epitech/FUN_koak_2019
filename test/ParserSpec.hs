@@ -46,24 +46,13 @@ spec = do
 
     describe "parse primary" $ do
         it "test identifier" $
-            applyParser parsePrimary "id" `shouldBe` (Right . KIdentifier) "id"
+            applyParser parsePrimary "id" `shouldBe` KIdentifier <$> applyParser parseIdentifier "id"
         it "test literal" $
-            applyParser parsePrimary "2" `shouldBe` (Right . KLiteral . KDecimalConst) 2
+            applyParser parsePrimary "2" `shouldBe` KLiteral <$> applyParser parseLiteral "2"
         it "test expressions" $
             applyParser parsePrimary "(2+3:4-5:6*7)"
             `shouldBe`
-            (Right $ KPrimaryExpressions
-                (KListExpr
-                    [ KExpression
-                        ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
-                        [ (KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 3) ]
-                    , KExpression
-                        ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4)
-                        [ (KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 5) ]
-                    , KExpression
-                        ((KPostfix . KPrimary . KLiteral . KDecimalConst) 6)
-                        [ (KBinOpMul, (KPostfix . KPrimary . KLiteral . KDecimalConst) 7) ]
-                    ]))
+            KPrimaryExpressions <$> applyParser parseExpressions "2+3:4-5:6*7"
 
     describe "parse postfix" $ do
         it "test primary identifier" $
