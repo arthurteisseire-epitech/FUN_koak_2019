@@ -152,24 +152,21 @@ spec = do
         it "test with one argument" $
             applyParser parsePrototypeArgs "(num:int):double"
             `shouldBe`
-            Right (KPrototypeArgs [KPrototypeArg "num" KIntType] KDoubleType)
+            Right (KPrototypeArgs (rights [ applyParser parsePrototypeArg "num:int" ]) KDoubleType)
 
         it "test with multiple argument" $
             applyParser parsePrototypeArgs "(num:int num2:double num3:int):double"
             `shouldBe`
-            Right (KPrototypeArgs [ KPrototypeArg "num" KIntType
-                                  , KPrototypeArg "num2" KDoubleType
-                                  , KPrototypeArg "num3" KIntType
-                                  ] KDoubleType)
+            Right (KPrototypeArgs (rights [ applyParser parsePrototypeArg "num:int"
+                                          , applyParser parsePrototypeArg "num2:double"
+                                          , applyParser parsePrototypeArg "num3:int"
+                                          ]) KDoubleType)
 
     describe "parse prototype" $
         it "test with multiple argument" $
             applyParser parsePrototype "addAll(num:int num2:double num3:int):double"
             `shouldBe`
-            (Right (KPrototype "addAll" (KPrototypeArgs [ KPrototypeArg "num" KIntType
-                                                        , KPrototypeArg "num2" KDoubleType
-                                                        , KPrototypeArg "num3" KIntType
-                                                        ] KDoubleType)))
+            (KPrototype "addAll" <$> (applyParser parsePrototypeArgs "(num:int num2:double num3:int):double"))
 
     describe "parse defs" $ do
         it "test implementation of a function with args" $
