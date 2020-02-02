@@ -89,7 +89,7 @@ spec = do
 
     describe "parse unary" $
         it "test unary" $
-            applyParser parseUnary "!toto" `shouldBe` Right (KUnOpUnary KUnOpNot ((KPostfix . KPrimary . KIdentifier) "toto"))
+            applyParser parseUnary "!toto" `shouldBe` KUnOpUnary KUnOpNot <$> (KPostfix <$> applyParser parsePostfix "toto")
 
     describe "parse expression" $ do
         it "test expression" $
