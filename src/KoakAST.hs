@@ -14,11 +14,11 @@ data KPrototype =
     deriving (Show, Eq) -- TODO : comprendre la grammaire pour compléter ce type (cf: sujet)
 
 data KPrototypeArgs =
-    KPrototypeArgs
-        { kArgName    :: KIdentifier
-        , kArgType    :: KType
-        , kReturnType :: KType
-        }
+    KPrototypeArgs [KPrototypeArg] KType
+    deriving (Show, Eq)
+
+data KPrototypeArg =
+    KPrototypeArg KIdentifier KType
     deriving (Show, Eq)
 
 data KExpressions
@@ -82,4 +82,5 @@ data KType
 type KIdentifier = String
 
 type KBinOp = String
+
 type KUnOp = String

@@ -140,6 +140,8 @@ spec = do
         it "test parse double type" $
             applyParser parseType "void" `shouldBe` Right KVoidType
 
-    describe "parse prototype args" $
-        it "test with one argument" $
-            applyParser parsePrototypeArgs "(num:int):int" `shouldBe` Right (KPrototypeArgs "num" KIntType KIntType)
+    describe "parse prototype arg" $ do
+        it "test int arg" $
+            applyParser parsePrototypeArg "num:int" `shouldBe` Right (KPrototypeArg "num" KIntType)
+        it "test double arg" $
+            applyParser parsePrototypeArg "n:double" `shouldBe` Right (KPrototypeArg "n" KDoubleType)
