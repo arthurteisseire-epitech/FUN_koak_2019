@@ -191,7 +191,7 @@ spec = do
                                   , KPrototypeArg "num3" KIntType
                                   ] KDoubleType)
 
-    describe "parse prototype" $ do
+    describe "parse prototype" $
         it "test with multiple argument" $
             applyParser parsePrototype "addAll(num:int num2:double num3:int):double"
             `shouldBe`
@@ -199,3 +199,28 @@ spec = do
                                                         , KPrototypeArg "num2" KDoubleType
                                                         , KPrototypeArg "num3" KIntType
                                                         ] KDoubleType)))
+
+    describe "parse defs" $ do
+        it "test implementation of a function with args" $
+            applyParser parseDefs "add(num1:int num2:int):int num1+num2"
+            `shouldBe`
+            (Right $ KDefs
+                        (KPrototype "add" (KPrototypeArgs [ KPrototypeArg "num1" KIntType
+                                                          , KPrototypeArg "num2" KIntType
+                                                          ] KIntType))
+                        (KListExpr
+                            [ KExpression
+                                ((KPostfix . KPrimary . KIdentifier) "num1")
+                                [ (KBinOpPlus, (KPostfix . KPrimary . KIdentifier) "num2") ]
+                            ]))
+
+        it "test implementation of a function whithout args" $
+            applyParser parseDefs "add():int 2+3"
+            `shouldBe`
+            (Right $ KDefs
+                        (KPrototype "add" (KPrototypeArgs [] KIntType))
+                        (KListExpr
+                            [ KExpression
+                                ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
+                                [ (KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 3) ]
+                            ]))

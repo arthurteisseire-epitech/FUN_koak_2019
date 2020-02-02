@@ -14,6 +14,13 @@ applyParser parser s
   where
     res = readP_to_S parser s
 
+parseDefs :: ReadP KDefs
+parseDefs = do
+    prototype <- parsePrototype
+    char ' '
+    expressions <- parseExpressions
+    return $ KDefs prototype expressions
+
 parsePrototype :: ReadP KPrototype
 parsePrototype = do
     identifier <- parseIdentifier
