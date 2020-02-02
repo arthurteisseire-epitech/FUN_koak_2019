@@ -56,19 +56,15 @@ spec = do
 
     describe "parse postfix" $ do
         it "test primary identifier" $
-            applyParser parsePostfix "toto" `shouldBe` (Right . KPrimary . KIdentifier) "toto"
+            applyParser parsePostfix "toto" `shouldBe` KPrimary <$> applyParser parsePrimary "toto"
         it "test primary decimal const" $
-            applyParser parsePostfix "2" `shouldBe` (Right . KPrimary . KLiteral . KDecimalConst) 2
+            applyParser parsePostfix "2" `shouldBe` KPrimary <$> applyParser parsePrimary "2"
         it "test primary double" $
-            applyParser parsePostfix "2.0" `shouldBe` (Right . KPrimary . KLiteral . KDoubleConst) 2
-        it "test call expr" $
+            applyParser parsePostfix "2.0" `shouldBe` KPrimary <$> applyParser parsePrimary "2.0"
+        it "test primary call expr" $
             applyParser parsePostfix "toto(1,2)"
             `shouldBe`
-            Right (KFuncCall
-                (KIdentifier "toto")
-                (KCallExpr [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) []
-                           , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) []
-                           ]))
+            KFuncCall <$> (applyParser parsePrimary "toto") <*> (applyParser parseCallExpr "(1,2)")
 
     describe "parse call expr" $ do
         it "test call expr with one args" $
