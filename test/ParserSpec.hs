@@ -172,26 +172,16 @@ spec = do
         it "test implementation of a function with args" $
             applyParser parseDefs "add(num1:int num2:int):int num1+num2"
             `shouldBe`
-            (Right $ KDefs
-                        (KPrototype "add" (KPrototypeArgs [ KPrototypeArg "num1" KIntType
-                                                          , KPrototypeArg "num2" KIntType
-                                                          ] KIntType))
-                        (KListExpr
-                            [ KExpression
-                                ((KPostfix . KPrimary . KIdentifier) "num1")
-                                [ (KBinOpPlus, (KPostfix . KPrimary . KIdentifier) "num2") ]
-                            ]))
+            (KDefs <$>
+                (applyParser parsePrototype "add(num1:int num2:int):int") <*>
+                (applyParser parseExpressions "num1+num2"))
 
         it "test implementation of a function whithout args" $
             applyParser parseDefs "add():int 2+3"
             `shouldBe`
-            (Right $ KDefs
-                        (KPrototype "add" (KPrototypeArgs [] KIntType))
-                        (KListExpr
-                            [ KExpression
-                                ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
-                                [ (KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 3) ]
-                            ]))
+            (KDefs <$>
+                (applyParser parsePrototype "add():int") <*>
+                (applyParser parseExpressions "2+3"))
 
     describe "parse kdefs" $ do
         it "test definition" $

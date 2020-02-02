@@ -101,7 +101,9 @@ parseLiteral = (KDoubleConst . readDouble <$> double) <|> (KDecimalConst . readI
 
 parseBinOp :: ReadP KBinOp
 parseBinOp =
-    (string "+" >> return KBinOpPlus) <|> (string "-" >> return KBinOpLess) <|> (string "*" >> return KBinOpMul) <|>
+    (string "+" >> return KBinOpPlus) <|>
+    (string "-" >> return KBinOpLess) <|>
+    (string "*" >> return KBinOpMul) <|>
     (string "/" >> return KBinOpDiv)
 
 parseUnOp :: ReadP KUnOp
