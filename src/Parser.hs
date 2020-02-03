@@ -1,4 +1,6 @@
-module Parser where
+module Parser
+    ( parseKoak
+    ) where
 
 import           Control.Applicative          (Alternative, (<|>))
 import           Control.Monad
@@ -7,8 +9,8 @@ import           KoakAST
 import           ParseUtils
 import           Text.ParserCombinators.ReadP
 
-parser :: String -> Either String KStmt
-parser = applyParser parseStmt
+parseKoak :: String -> Either String KStmt
+parseKoak = applyParser parseStmt
 
 applyParser :: ReadP a -> String -> Either String a
 applyParser parser s
@@ -55,8 +57,7 @@ parsePrototypeArg = do
 
 parseType :: ReadP KType
 parseType =
-    (string "int" >> return KIntType) <|>
-    (string "double" >> return KDoubleType) <|>
+    (string "int" >> return KIntType) <|> (string "double" >> return KDoubleType) <|>
     (string "void" >> return KVoidType)
 
 parseExpressions :: ReadP KExpressions
@@ -104,9 +105,7 @@ parseLiteral = (KDoubleConst . readDouble <$> checkParseDouble) <|> (KDecimalCon
 
 parseBinOp :: ReadP KBinOp
 parseBinOp =
-    (string "+" >> return KBinOpPlus) <|>
-    (string "-" >> return KBinOpLess) <|>
-    (string "*" >> return KBinOpMul) <|>
+    (string "+" >> return KBinOpPlus) <|> (string "-" >> return KBinOpLess) <|> (string "*" >> return KBinOpMul) <|>
     (string "/" >> return KBinOpDiv)
 
 parseUnOp :: ReadP KUnOp
