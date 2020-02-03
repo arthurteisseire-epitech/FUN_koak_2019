@@ -5,13 +5,13 @@ import           Control.Monad                (liftM2)
 import           Data.Char
 import           Text.ParserCombinators.ReadP
 
-double :: ReadP String
-double = integer <++> decimalPart
+checkParseDouble :: ReadP String
+checkParseDouble = checkParseInt <++> decimalPart
   where
     decimalPart = char '.' <:> number
 
-integer :: ReadP String
-integer = plus <|> minus <|> number
+checkParseInt :: ReadP String
+checkParseInt = plus <|> minus <|> number
 
 number :: ReadP String
 number = munch1 isDigit

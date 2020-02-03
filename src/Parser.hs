@@ -97,7 +97,7 @@ parseIdentifier :: ReadP KIdentifier
 parseIdentifier = satisfy isAlpha <:> munch isAlphaNum
 
 parseLiteral :: ReadP KLiteral
-parseLiteral = (KDoubleConst . readDouble <$> double) <|> (KDecimalConst . readInt <$> integer)
+parseLiteral = (KDoubleConst . readDouble <$> checkParseDouble) <|> (KDecimalConst . readInt <$> checkParseInt)
 
 parseBinOp :: ReadP KBinOp
 parseBinOp =
