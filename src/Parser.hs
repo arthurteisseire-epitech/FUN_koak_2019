@@ -7,6 +7,9 @@ import           KoakAST
 import           ParseUtils
 import           Text.ParserCombinators.ReadP
 
+parser :: String -> Either String KStmt
+parser = applyParser parseStmt
+
 applyParser :: ReadP a -> String -> Either String a
 applyParser parser s
     | null res = Left "Any Error"
