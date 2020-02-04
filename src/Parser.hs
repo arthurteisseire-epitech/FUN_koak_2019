@@ -14,14 +14,14 @@ parseKoak = applyParser parseStmt
 
 applyParser :: ReadP a -> String -> Either String a
 applyParser parser s
-    | null res = Left "Any Error"
+    | null res = Left "Syntax error"
     | otherwise = Right . fst . last $ res
   where
     res = readP_to_S parser s
 
 parseStmt :: ReadP KStmt
 parseStmt = do
-    stmt <- sepBy parseKDefs (char ' ')
+    stmt <- sepBy1 parseKDefs (char ' ')
     return $ KStmt stmt
 
 parseKDefs :: ReadP KDefs
