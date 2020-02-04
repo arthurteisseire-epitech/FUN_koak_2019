@@ -85,6 +85,7 @@ data KBinOp
     | KBinOpMul
     | KBinOpDiv
     | KBinOpInf
+    | KBinOpAssign
     deriving (Show, Eq)
 
 data KUnOp

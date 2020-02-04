@@ -71,3 +71,20 @@ spec = do
                            (KListExpr [KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) []])
                            (KListExpr [KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) []])
                      ])
+        it "test while" $
+            parseKoak "while i<10 do i=i+1;" `shouldBe`
+            Right
+                (KStmt
+                     [ KExpressions $
+                       KWhile
+                           (KExpression
+                                ((KPostfix . KPrimary . KIdentifier) "i")
+                                [(KBinOpInf, (KPostfix . KPrimary . KLiteral . KDecimalConst) 10)])
+                           (KListExpr
+                                [ KExpression
+                                      ((KPostfix . KPrimary . KIdentifier) "i")
+                                      [ (KBinOpAssign, (KPostfix . KPrimary . KIdentifier) "i")
+                                      , (KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 1)
+                                      ]
+                                ])
+                     ])

@@ -61,7 +61,15 @@ parseType =
     (string "void" >> return KVoidType)
 
 parseExpressions :: ReadP KExpressions
-parseExpressions = parseListExpr <|> parseIfElse <|> parseIf -- TODO : Add '<|> parseFor <|> parseIfElse <|> parseWhile'
+parseExpressions = parseListExpr <|> parseIfElse <|> parseIf <|> parseWhile -- TODO : Add '<|> parseFor <|> parseWhile'
+
+parseWhile :: ReadP KExpressions
+parseWhile = do
+    string "while "
+    condition <- parseExpression
+    string " do "
+    doExpr <- parseExpressions
+    return $ KWhile condition doExpr
 
 parseIfElse :: ReadP KExpressions
 parseIfElse = do
@@ -126,7 +134,7 @@ parseLiteral = (KDoubleConst . readDouble <$> checkParseDouble) <|> (KDecimalCon
 parseBinOp :: ReadP KBinOp
 parseBinOp =
     (string "+" >> return KBinOpPlus) <|> (string "-" >> return KBinOpLess) <|> (string "*" >> return KBinOpMul) <|>
-    (string "/" >> return KBinOpDiv) <|> (string "<" >> return KBinOpInf)
+    (string "/" >> return KBinOpDiv) <|> (string "<" >> return KBinOpInf) <|> (string "=" >> return KBinOpAssign)
 
 parseUnOp :: ReadP KUnOp
 parseUnOp = (string "!" >> return KUnOpNot) <|> (string "-" >> return KUnOpLess)
