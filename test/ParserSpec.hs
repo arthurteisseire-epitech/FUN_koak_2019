@@ -30,7 +30,6 @@ spec = do
                                  [(KBinOpDiv, (KPostfix . KPrimary . KIdentifier) "num2")]
                            ]
                      ])
-
         it "test definition" $
             parseKoak "def add(num1:int num2:int):int num1+num2;" `shouldBe`
             Right
@@ -43,5 +42,20 @@ spec = do
                                 [ KExpression
                                       ((KPostfix . KPrimary . KIdentifier) "num1")
                                       [(KBinOpPlus, (KPostfix . KPrimary . KIdentifier) "num2")]
+                                ])
+                     ])
+        it "test condition" $
+            parseKoak "if 1<2 then 1+2;" `shouldBe`
+            Right
+                (KStmt
+                     [ KExpressions $
+                       KIf
+                           (KExpression
+                                ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1)
+                                [(KBinOpInf, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)])
+                           (KListExpr
+                                [ KExpression
+                                      ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1)
+                                      [(KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)]
                                 ])
                      ])
