@@ -61,7 +61,19 @@ parseType =
     (string "void" >> return KVoidType)
 
 parseExpressions :: ReadP KExpressions
-parseExpressions = parseListExpr <|> parseIfElse <|> parseIf <|> parseWhile -- TODO : Add '<|> parseFor <|> parseWhile'
+parseExpressions = parseListExpr <|> parseIfElse <|> parseIf <|> parseWhile <|> parseFor
+
+parseFor :: ReadP KExpressions
+parseFor = do
+    string "for "
+    assign <- parseExpression
+    char ','
+    condition <- parseExpression
+    char ','
+    increment <- parseExpression
+    string " in "
+    inExpr <- parseExpressions
+    return $ KFor assign condition increment inExpr
 
 parseWhile :: ReadP KExpressions
 parseWhile = do

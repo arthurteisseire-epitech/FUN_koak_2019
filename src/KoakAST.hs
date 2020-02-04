@@ -23,10 +23,10 @@ data KPrototypeArg =
 
 data KExpressions
     = KFor
-          { kForCounter    :: KIdentifier
-          , kForStartValue :: KExpression
-          , kForMax        :: KExpression
-          , kForIn         :: KExpressions
+          { kForCounter   :: KExpression
+          , kForCondition :: KExpression
+          , kForIncrement :: KExpression
+          , kForIn        :: KExpressions
           }
     | KIf -- Mahé kif ce type
           { kIfCond :: KExpression

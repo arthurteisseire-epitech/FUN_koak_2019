@@ -88,3 +88,29 @@ spec = do
                                       ]
                                 ])
                      ])
+        it "test for" $
+            parseKoak "for i=0,i<10,i=i+1 in res=res+i*2;" `shouldBe`
+            Right
+                (KStmt
+                     [ KExpressions $
+                       KFor
+                           (KExpression
+                                ((KPostfix . KPrimary . KIdentifier) "i")
+                                [(KBinOpAssign, (KPostfix . KPrimary . KLiteral . KDecimalConst) 0)])
+                           (KExpression
+                                ((KPostfix . KPrimary . KIdentifier) "i")
+                                [(KBinOpInf, (KPostfix . KPrimary . KLiteral . KDecimalConst) 10)])
+                           (KExpression
+                                ((KPostfix . KPrimary . KIdentifier) "i")
+                                [ (KBinOpAssign, (KPostfix . KPrimary . KIdentifier) "i")
+                                , (KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 1)
+                                ])
+                           (KListExpr
+                                [ KExpression
+                                      ((KPostfix . KPrimary . KIdentifier) "res")
+                                      [ (KBinOpAssign, (KPostfix . KPrimary . KIdentifier) "res")
+                                      , (KBinOpPlus, (KPostfix . KPrimary . KIdentifier) "i")
+                                      , (KBinOpMul, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
+                                      ]
+                                ])
+                     ])
