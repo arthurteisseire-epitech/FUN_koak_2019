@@ -44,7 +44,7 @@ spec = do
                                       [(KBinOpPlus, (KPostfix . KPrimary . KIdentifier) "num2")]
                                 ])
                      ])
-        it "test condition" $
+        it "test if then" $
             parseKoak "if 1<2 then 1+2;" `shouldBe`
             Right
                 (KStmt
@@ -58,4 +58,16 @@ spec = do
                                       ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1)
                                       [(KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)]
                                 ])
+                     ])
+        it "test if then else" $
+            parseKoak "if 1<2 then 1 else 2;" `shouldBe`
+            Right
+                (KStmt
+                     [ KExpressions $
+                       KIfElse
+                           (KExpression
+                                ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1)
+                                [(KBinOpInf, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)])
+                           (KListExpr [KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) []])
+                           (KListExpr [KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) []])
                      ])

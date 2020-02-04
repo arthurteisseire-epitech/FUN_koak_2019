@@ -61,7 +61,14 @@ parseType =
     (string "void" >> return KVoidType)
 
 parseExpressions :: ReadP KExpressions
-parseExpressions = parseListExpr <|> parseIf -- TODO : Add '<|> parseFor <|> parseIfElse <|> parseWhile'
+parseExpressions = parseListExpr <|> parseIfElse <|> parseIf -- TODO : Add '<|> parseFor <|> parseIfElse <|> parseWhile'
+
+parseIfElse :: ReadP KExpressions
+parseIfElse = do
+    (condition, thenExpr) <- parseIfThen
+    string " else "
+    elseExpr <- parseExpressions
+    return $ KIfElse condition thenExpr elseExpr
 
 parseIf :: ReadP KExpressions
 parseIf = do
