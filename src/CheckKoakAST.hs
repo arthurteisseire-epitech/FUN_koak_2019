@@ -9,11 +9,13 @@ checkKoakAST stmt -- TODO : check same identifier between funcCall and prototype
     | isValid = Right stmt
     | otherwise = Left "Identifier error"
   where
-    isValid = checkIdentifierInFuncCall stmt
+    isValid = checkFuncCalls stmt
 
-checkIdentifierInFuncCall :: KStmt -> Bool
-checkIdentifierInFuncCall stmt =
-    any (checkFuncCallMatchPrototype ((head . findFuncCallsFromStmt) stmt)) (findPrototypes stmt)
+checkFuncCalls :: KStmt -> Bool
+checkFuncCalls stmt = all (checkIdentifierInFuncCall stmt) (findFuncCallsFromStmt stmt)
+
+checkIdentifierInFuncCall :: KStmt -> KPostfix -> Bool
+checkIdentifierInFuncCall stmt funcCall = any (checkFuncCallMatchPrototype funcCall) (findPrototypes stmt)
 
 checkFuncCallMatchPrototype :: KPostfix -> KPrototype -> Bool
 checkFuncCallMatchPrototype (KFuncCall (KIdentifier funcCallId) _) (KPrototype protoId _) = funcCallId == protoId

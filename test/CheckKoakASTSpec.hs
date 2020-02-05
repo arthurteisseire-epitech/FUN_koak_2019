@@ -18,6 +18,8 @@ spec =
             parseAndCheckKoak "add(1,2); def sub(n1:int n2:int):int n1-n2;" `shouldSatisfy` isLeft
         it "call function with a match prototype on the second position" $
             parseAndCheckKoak "add(1,2); def sub(n1:int n2:int):int n1-n2; def add(n1:int n2:int):int n1+n2;" `shouldSatisfy` isRight
+        it "call function without a match prototype in multiple definition" $
+            parseAndCheckKoak "add(1,2); mul(1,2); def sub(n1:int n2:int):int n1-n2; def add(n1:int n2:int):int n1+n2;" `shouldSatisfy` isLeft
 
     -- TODO : describe "prototype mismatch with good identifier"
     -- TODO : describe "type error"
