@@ -9,41 +9,26 @@ checkKoakAST stmt -- TODO : check same identifier between funcCall and prototype
     | isValid = Right stmt
     | otherwise = Left "Identifier error"
   where
-    isValid = checkFuncCalls stmt
+    isValid = checkFuncCallsMatchPrototypes stmt
 
-checkFuncCalls :: KStmt -> Bool
-checkFuncCalls stmt = all (checkIdentifierInFuncCall stmt) (findFuncCallsFromStmt stmt)
+checkFuncCallsMatchPrototypes :: KStmt -> Bool
+checkFuncCallsMatchPrototypes stmt = all (checkFuncCallMatchPrototypes stmt) (findFuncCalls stmt)
+  where
+    checkFuncCallMatchPrototypes stmt funcCall = any (checkFuncCallMatchPrototype funcCall) (findPrototypes stmt)
+    checkFuncCallMatchPrototype (KFuncCall (KIdentifier funcCallId) _) (KPrototype protoId _) = funcCallId == protoId
+    checkFuncCallMatchPrototype _ _ = False
 
-checkIdentifierInFuncCall :: KStmt -> KPostfix -> Bool
-checkIdentifierInFuncCall stmt funcCall = any (checkFuncCallMatchPrototype funcCall) (findPrototypes stmt)
-
-checkFuncCallMatchPrototype :: KPostfix -> KPrototype -> Bool
-checkFuncCallMatchPrototype (KFuncCall (KIdentifier funcCallId) _) (KPrototype protoId _) = funcCallId == protoId
-checkFuncCallMatchPrototype _ _ = False
-
-
-findFuncCallsFromStmt :: KStmt -> [KPostfix]
-findFuncCallsFromStmt (KStmt defs) = concatMap findFuncCalls (mapMaybe getExpressions defs)
-
-getExpressions :: KDefs -> Maybe KExpressions
-getExpressions (KExpressions exprs) = return exprs
-getExpressions _ = Nothing
-
-findFuncCalls :: KExpressions -> [KPostfix]
-findFuncCalls (KListExpr exprs) = mapMaybe extractFuncCall exprs
-
-extractFuncCall :: KExpression -> Maybe KPostfix
-extractFuncCall (KExpression (KPostfix funcCall) []) = getFuncCall funcCall
-extractFuncCall _                                    = Nothing
-
-getFuncCall :: KPostfix -> Maybe KPostfix
-getFuncCall (KFuncCall identifier args) = return $ KFuncCall identifier args
-getFuncCall _                           = Nothing
-
+findFuncCalls :: KStmt -> [KPostfix]
+findFuncCalls (KStmt defs) = concatMap findFuncCallsFromExpressions (mapMaybe getExpressions defs)
+  where
+    findFuncCallsFromExpressions (KListExpr exprs) = mapMaybe extractFuncCall exprs
+    getExpressions (KExpressions exprs) = return exprs
+    getExpressions _                    = Nothing
+    extractFuncCall (KExpression (KPostfix (KFuncCall identifier args)) []) = return $ KFuncCall identifier args
+    extractFuncCall _ = Nothing
 
 findPrototypes :: KStmt -> [KPrototype]
 findPrototypes (KStmt defs) = mapMaybe extractPrototype defs
-
-extractPrototype :: KDefs -> Maybe KPrototype
-extractPrototype (KDefs (KPrototype identifier args) _) = return $ KPrototype identifier args
-extractPrototype _ = Nothing
+  where
+    extractPrototype (KDefs (KPrototype identifier args) _) = return $ KPrototype identifier args
+    extractPrototype _ = Nothing
