@@ -11,9 +11,11 @@ main = hspec spec
 
 spec :: Spec
 spec = do
-    describe "identifier error" $
-        it "call unexsting function call" $ do
+    describe "identifier error" $ do
+        it "call function without prototype" $
             parseAndCheckKoak "add(1,2);" `shouldSatisfy` isLeft
+        it "call function with a mismatch prototype" $
+            parseAndCheckKoak "add(1,2); def sub(n1:int n2:int):int n1-n2;" `shouldSatisfy` isLeft
 
     -- TODO : describe "type error"
     -- TODO : describe " error"
