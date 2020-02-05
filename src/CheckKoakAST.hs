@@ -1,28 +1,47 @@
 module CheckKoakAST where
 
-import           Data.Maybe (fromJust, isJust)
+import           Data.Maybe
+import           Debug.Trace
 import           KoakAST
 
 checkKoakAST :: KStmt -> Either String KStmt
 checkKoakAST stmt -- TODO : check same identifier between funcCall and prototype
-    | isJust checkedStmt = Right stmt
+    | isValid = Right stmt
     | otherwise = Left "Identifier error"
   where
-    checkedStmt = checkIdentifierInFuncCall stmt
+    isValid = checkIdentifierInFuncCall stmt
 
-checkIdentifierInFuncCall :: KStmt -> Maybe KStmt
-checkIdentifierInFuncCall stmt = do
-    (KFuncCall (KIdentifier funcCallId) _) <- findFuncCall stmt
-    (KPrototype prototypeId _) <- findPrototype stmt
-    if funcCallId == prototypeId
-        then return stmt
-        else Nothing
+checkIdentifierInFuncCall :: KStmt -> Bool
+checkIdentifierInFuncCall stmt =
+    any (checkFuncCallMatchPrototype ((head . findFuncCallsFromStmt) stmt)) (findPrototypes stmt)
 
-findFuncCall :: KStmt -> Maybe KPostfix
-findFuncCall (KStmt [KExpressions (KListExpr [KExpression (KPostfix (KFuncCall (KIdentifier identifier) (KCallExpr args))) []])]) =
-    Just $ KFuncCall (KIdentifier identifier) (KCallExpr args)
-findFuncCall _ = Nothing
+checkFuncCallMatchPrototype :: KPostfix -> KPrototype -> Bool
+checkFuncCallMatchPrototype (KFuncCall (KIdentifier funcCallId) _) (KPrototype protoId _) = funcCallId == protoId
+checkFuncCallMatchPrototype _ _ = False
 
-findPrototype :: KStmt -> Maybe KPrototype
-findPrototype (KStmt [KDefs (KPrototype identifier args) (KListExpr [])]) = Just $ KPrototype identifier args
-findPrototype _ = Nothing
+
+findFuncCallsFromStmt :: KStmt -> [KPostfix]
+findFuncCallsFromStmt (KStmt defs) = concatMap findFuncCalls (mapMaybe getExpressions defs)
+
+getExpressions :: KDefs -> Maybe KExpressions
+getExpressions (KExpressions exprs) = return exprs
+getExpressions _ = Nothing
+
+findFuncCalls :: KExpressions -> [KPostfix]
+findFuncCalls (KListExpr exprs) = mapMaybe extractFuncCall exprs
+
+extractFuncCall :: KExpression -> Maybe KPostfix
+extractFuncCall (KExpression (KPostfix funcCall) []) = getFuncCall funcCall
+extractFuncCall _                                    = Nothing
+
+getFuncCall :: KPostfix -> Maybe KPostfix
+getFuncCall (KFuncCall identifier args) = return $ KFuncCall identifier args
+getFuncCall _                           = Nothing
+
+
+findPrototypes :: KStmt -> [KPrototype]
+findPrototypes (KStmt defs) = mapMaybe extractPrototype defs
+
+extractPrototype :: KDefs -> Maybe KPrototype
+extractPrototype (KDefs (KPrototype identifier args) _) = return $ KPrototype identifier args
+extractPrototype _ = Nothing
