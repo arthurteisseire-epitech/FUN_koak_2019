@@ -44,6 +44,23 @@ spec = do
                                       [(KBinOpPlus, (KPostfix . KPrimary . KIdentifier) "num2")]
                                 ])
                      ])
+        it "test function call" $
+            parseKoak "add(2,4);" `shouldBe`
+            Right
+                (KStmt
+                     [ KExpressions $
+                       KListExpr
+                           [ KExpression
+                                 (KPostfix $
+                                  KFuncCall
+                                      (KIdentifier "add")
+                                      (KCallExpr
+                                           [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) []
+                                           , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4) []
+                                           ]))
+                                 []
+                           ]
+                     ])
         it "test if then" $
             parseKoak "if 1<2 then 1+2;" `shouldBe`
             Right
