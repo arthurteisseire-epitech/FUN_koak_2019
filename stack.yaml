@@ -64,3 +64,16 @@ packages:
 #
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
+
+extra-deps:
+  - llvm-hs-6.0.0
+  - llvm-hs-pure-6.0.0
+
+flags:
+  llvm-hs:
+    shared-llvm: true
+
+nix:
+  enable: true
+  packages: [llvm_6]
+

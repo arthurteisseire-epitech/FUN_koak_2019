@@ -3,7 +3,21 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: llvm-hs-6.0.0@sha256:b86fd34481b151486a8fa6647c955bceb188ab8015e8069b3d2e3e8169dc87ae,8886
+    pantry-tree:
+      size: 12671
+      sha256: a86b71cebb3626b433618420898c308bbe73c38e88c039070b98d21560541127
+  original:
+    hackage: llvm-hs-6.0.0
+- completed:
+    hackage: llvm-hs-pure-6.0.0@sha256:63e5e91dd24b66b52311dc109bdc94ac6a773d60d07977d61c3b2626e4672d16,3666
+    pantry-tree:
+      size: 2588
+      sha256: 38f8bc8d5a7be50a0d7d14198b094da1661ce00fb3023f4968d0a5f29cc681c4
+  original:
+    hackage: llvm-hs-pure-6.0.0
 snapshots:
 - completed:
     size: 506303
