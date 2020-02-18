@@ -14,7 +14,7 @@ import LLVM.Target
 
 import qualified Data.ByteString.Char8 as BS
 
-import LLVMSubExample
+import LLVMTest
 
 main :: IO ()
 main = withContext $ \ctx -> do

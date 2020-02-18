@@ -9,10 +9,30 @@ import           LLVM.AST.AddrSpace         as AST
 import           LLVM.AST.CallingConvention as AST
 import           LLVM.AST.Constant          as C
 import           LLVM.AST.Float             as F
+import           LLVM.AST.Global
 import           LLVM.AST.IntegerPredicate  as AST
 import           LLVM.AST.Type              as AST
 
+import           LLVM.Prelude
+import           LLVM.Context
+import           LLVM.Module
+import           LLVM.Target
+
+import Data.ByteString.Short
+
+
+
 import           Data.Maybe
+
+kDefToGlobalDef :: KStmt -> Definition
+kDefToGlobalDef (KStmt [KDefs (KPrototype funcName (KPrototypeArgs [] KIntType)) (KListExpr [expr])]) =
+    GlobalDefinition
+        functionDefaults
+            { name = mkName funcName
+            , parameters = ([], False)
+            , returnType = AST.i32
+            , basicBlocks = [kExpressionToBasicBlock expr]
+            }
 
 kExpressionToBasicBlock :: KExpression -> BasicBlock
 kExpressionToBasicBlock expr =
@@ -20,7 +40,7 @@ kExpressionToBasicBlock expr =
         (Name "entry")
         [ Name "res" :=
           ((binOpConvert . getBinOp) expr)
-              AST.noFastMathFlags
+              False False
               ((kLiteralToLOperand . getFirstKLiteral) expr)
               ((kLiteralToLOperand . getSecondKLiteral) expr)
               []
@@ -30,7 +50,7 @@ kExpressionToBasicBlock expr =
 kExpressionToLInstruction :: KExpression -> Instruction
 kExpressionToLInstruction expr =
     ((binOpConvert . getBinOp) expr)
-        AST.noFastMathFlags
+        False False
         ((kLiteralToLOperand . getFirstKLiteral) expr)
         ((kLiteralToLOperand . getSecondKLiteral) expr)
         []
@@ -51,5 +71,5 @@ kLiteralToLOperand :: KLiteral -> Operand
 kLiteralToLOperand (KDecimalConst x) = ConstantOperand (C.Int 32 (toInteger x))
 kLiteralToLOperand (KDoubleConst x) = ConstantOperand (C.Float (F.Single (realToFrac x)))
 
-binOpConvert :: KBinOp -> FastMathFlags -> Operand -> Operand -> InstructionMetadata -> Instruction
-binOpConvert KBinOpLess = AST.FSub
+binOpConvert :: KBinOp -> Bool -> Bool -> Operand -> Operand -> InstructionMetadata -> Instruction
+binOpConvert KBinOpLess = AST.Sub
