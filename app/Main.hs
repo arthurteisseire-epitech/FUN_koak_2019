@@ -14,11 +14,11 @@ import LLVM.Target
 
 import qualified Data.ByteString.Char8 as BS
 
-import LLVMTest
+import LLVMSubExample
 
 main :: IO ()
 main = withContext $ \ctx -> do
-    tm <- getDefaultTargetTriple
+--    tm <- getDefaultTargetTriple
     -- writeObjectToFile tm "a.out" myModule
     llvm <- withModuleFromAST ctx llvmTestModule moduleLLVMAssembly
     BS.putStrLn llvm

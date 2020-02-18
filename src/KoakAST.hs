@@ -28,7 +28,7 @@ data KExpressions
           , kForIncrement :: KExpression
           , kForIn        :: KExpressions
           }
-    | KIf -- Mahé kif ce type
+    | KIf -- Mahé kif ce type 
           { kIfCond :: KExpression
           , kIfThen :: KExpressions
           }
