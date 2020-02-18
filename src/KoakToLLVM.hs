@@ -1,13 +1,31 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module KoakToLLVM where
 
 import           KoakAST
 
 import           LLVM.AST                   as AST
+import           LLVM.AST.AddrSpace         as AST
 import           LLVM.AST.CallingConvention as AST
 import           LLVM.AST.Constant          as C
 import           LLVM.AST.Float             as F
+import           LLVM.AST.IntegerPredicate  as AST
+import           LLVM.AST.Type              as AST
 
-import Data.Maybe
+import           Data.Maybe
+
+kExpressionToBasicBlock :: KExpression -> BasicBlock
+kExpressionToBasicBlock expr =
+    BasicBlock
+        (Name "entry")
+        [ Name "res" :=
+          ((binOpConvert . getBinOp) expr)
+              AST.noFastMathFlags
+              ((kLiteralToLOperand . getFirstKLiteral) expr)
+              ((kLiteralToLOperand . getSecondKLiteral) expr)
+              []
+        ]
+        (Do $ Ret (Just $ LocalReference AST.i32 (Name "res")) [])
 
 kExpressionToLInstruction :: KExpression -> Instruction
 kExpressionToLInstruction expr =
