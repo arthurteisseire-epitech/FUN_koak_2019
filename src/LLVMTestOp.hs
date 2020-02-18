@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module LLVMSubExample where
+module LLVMTestOp where
 
 import LLVM.AST as AST
 import LLVM.AST.CallingConvention as AST
@@ -16,7 +16,7 @@ import LLVM.Target
 
 defMul :: Definition
 defMul = GlobalDefinition functionDefaults
-    { name = Name "min"
+    { name = Name "mul"
     , parameters =
         ( [ Parameter AST.i32 (Name "a") []
           , Parameter AST.i32 (Name "b") [] ]
@@ -66,8 +66,8 @@ defSub = GlobalDefinition functionDefaults
                 []
             )
 
-llvmTestModule :: AST.Module
-llvmTestModule = defaultModule
-    { moduleName = "min"
+llvmTestOp :: AST.Module
+llvmTestOp = defaultModule
+    { moduleName = "OpModule"
     , moduleDefinitions = [defSub, defMul]
     }
