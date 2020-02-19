@@ -31,17 +31,20 @@ kDefToGlobalDef (KStmt [KDefs (KPrototype funcName (KPrototypeArgs args KIntType
             }
 
 kArgsToLArgs :: [KPrototypeArg] -> [Parameter]
-kArgsToLArgs args = map (\(KPrototypeArg kId kType) -> Parameter (kReturnTypeToLReturnType kType) (mkName kId) []) args
+kArgsToLArgs = map (\(KPrototypeArg kId kType) -> Parameter (kReturnTypeToLReturnType kType) (mkName kId) [])
 
 kReturnTypeToLReturnType :: KType -> Type
 kReturnTypeToLReturnType KIntType = AST.i32
 
 kExpressionToBasicBlock :: KExpression -> BasicBlock
+kExpressionToBasicBlock expr@(KExpression _ []) =
+    BasicBlock (Name "entry") [] (Do $ Ret (Just $ (kPrimaryToOperand . getFirstKPrimary) expr) [])
 kExpressionToBasicBlock expr =
     BasicBlock
         (Name "entry")
         [ Name "res" :=
-          ((binOpConvert . getBinOp) expr)
+          (binOpConvert . getBinOp)
+              expr
               ((kPrimaryToOperand . getFirstKPrimary) expr)
               ((kPrimaryToOperand . getSecondKPrimary) expr)
               []
@@ -55,7 +58,7 @@ getFirstKPrimary :: KExpression -> KPrimary
 getFirstKPrimary (KExpression (KPostfix (KPrimary primary)) _) = primary
 
 getSecondKPrimary :: KExpression -> KPrimary
-getSecondKPrimary (KExpression _ [(_, (KPostfix (KPrimary primary)))]) = primary
+getSecondKPrimary (KExpression _ [(_, KPostfix (KPrimary primary))]) = primary
 
 getValueFromPostfix :: KPostfix -> KLiteral
 getValueFromPostfix (KPrimary (KLiteral x)) = x
@@ -71,5 +74,5 @@ kLiteralToLOperand (KDoubleConst x) = ConstantOperand (C.Float (F.Single (realTo
 binOpConvert :: KBinOp -> Operand -> Operand -> InstructionMetadata -> Instruction
 binOpConvert KBinOpLess = AST.Sub False False
 binOpConvert KBinOpPlus = AST.Add False False
-binOpConvert KBinOpMul = AST.Mul False False
-binOpConvert KBinOpDiv = AST.SDiv False
+binOpConvert KBinOpMul  = AST.Mul False False
+binOpConvert KBinOpDiv  = AST.SDiv False

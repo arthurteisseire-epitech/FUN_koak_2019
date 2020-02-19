@@ -25,6 +25,9 @@ main = hspec spec
 spec :: Spec
 spec = do
     describe "expression to BasicBlock" $ do
+        it "test 1" $
+            kExpressionToBasicBlock (KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) []) `shouldBe`
+            BasicBlock (Name "entry") [] (Do $ Ret (Just $ ConstantOperand (C.Int 32 1)) [])
         it "test 1-2" $
             kExpressionToBasicBlock
                 (KExpression
@@ -60,7 +63,6 @@ spec = do
                                 (Do $ Ret (Just $ LocalReference AST.i32 (Name "res")) [])
                           ]
                     }
-
         it "test function with args" $
             kDefToGlobalDef
                 (KStmt
