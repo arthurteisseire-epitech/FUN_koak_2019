@@ -48,13 +48,6 @@ kExpressionToBasicBlock expr =
         ]
         (Do $ Ret (Just $ LocalReference AST.i32 (Name "res")) [])
 
-kExpressionToLInstruction :: KExpression -> Instruction
-kExpressionToLInstruction expr =
-    ((binOpConvert . getBinOp) expr)
-        ((kPrimaryToOperand . getFirstKPrimary) expr)
-        ((kPrimaryToOperand . getSecondKPrimary) expr)
-        []
-
 getBinOp :: KExpression -> KBinOp
 getBinOp (KExpression _ [(binOp, _)]) = binOp
 

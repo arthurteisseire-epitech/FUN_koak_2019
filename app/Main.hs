@@ -2,22 +2,12 @@
 
 module Main where
 
-import           LLVM.AST                   as AST
-import           LLVM.AST.AddrSpace         as AST
-import           LLVM.AST.CallingConvention as AST
-import           LLVM.AST.Constant          as C
-import           LLVM.AST.Global
-import           LLVM.AST.IntegerPredicate  as AST
-import           LLVM.AST.Type              as AST
+import           LLVM.AST              as AST
 
 import           LLVM.Context
 import           LLVM.Module
-import           LLVM.Target
 
-import qualified Data.ByteString.Char8      as BS
-
-import           LLVMTestMain
-import           LLVMTestOp
+import qualified Data.ByteString.Char8 as BS
 
 import           System.Environment
 import           System.Exit
@@ -35,8 +25,8 @@ interpretFile filename = openFile filename ReadMode >>= hGetContents >>= srcToDe
 srcToDef :: String -> IO Definition
 srcToDef src = kDefToGlobalDef <$> parse src
   where
-    parse src =
-        case parseKoak src of
+    parse s =
+        case parseKoak s of
             Left errorMsg -> putStrLn errorMsg >> exitWith (ExitFailure 84)
             Right koakAst -> pure koakAst
 
