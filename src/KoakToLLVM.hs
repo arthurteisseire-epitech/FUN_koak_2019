@@ -20,6 +20,9 @@ import           LLVM.Target
 
 import           Data.Maybe
 
+koakToLLVM :: KStmt -> [Definition]
+koakToLLVM (KStmt defs) = map kDefToGlobalDef defs
+
 kCallToLLVMCall :: KPostfix -> Instruction
 kCallToLLVMCall (KFuncCall (KIdentifier identifier) (KCallExpr args)) =
     AST.Call
@@ -40,14 +43,14 @@ kCallToLLVMCall (KFuncCall (KIdentifier identifier) (KCallExpr args)) =
 exprToFirstOperand :: KExpression -> Operand
 exprToFirstOperand = kPrimaryToOperand . getFirstKPrimary
 
-kDefToGlobalDef :: KStmt -> Definition
-kDefToGlobalDef (KStmt [KDefs (KPrototype funcName (KPrototypeArgs args KIntType)) (KListExpr [expr])]) =
+kDefToGlobalDef :: KDefs -> Definition
+kDefToGlobalDef (KDefs (KPrototype funcName (KPrototypeArgs args KIntType)) (KListExpr exprs)) =
     GlobalDefinition
         functionDefaults
             { name = mkName funcName
             , parameters = (kArgsToLArgs args, False)
             , returnType = AST.i32
-            , basicBlocks = [kExpressionToBasicBlock expr]
+            , basicBlocks = map kExpressionToBasicBlock exprs
             }
 
 kArgsToLArgs :: [KPrototypeArg] -> [Parameter]

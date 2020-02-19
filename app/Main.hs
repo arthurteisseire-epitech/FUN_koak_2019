@@ -17,13 +17,13 @@ import           KoakToLLVM
 import           Parser
 
 main :: IO ()
-main = getArgs >>= mapM interpretFile >>= mapM_ (printLLVM . llvmTestModule)
+main = getArgs >>= mapM interpretFile >>= mapM_ (mapM_ (printLLVM . llvmTestModule))
 
-interpretFile :: String -> IO Definition
+interpretFile :: String -> IO [Definition]
 interpretFile filename = openFile filename ReadMode >>= hGetContents >>= srcToDef
 
-srcToDef :: String -> IO Definition
-srcToDef src = kDefToGlobalDef <$> parse src
+srcToDef :: String -> IO [Definition]
+srcToDef src = koakToLLVM <$> parse src
   where
     parse s =
         case parseKoak s of
