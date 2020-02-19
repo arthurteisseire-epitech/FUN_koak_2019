@@ -42,8 +42,6 @@ kExpressionToBasicBlock expr =
         (Name "entry")
         [ Name "res" :=
           ((binOpConvert . getBinOp) expr)
-              False
-              False
               ((kPrimaryToOperand . getFirstKPrimary) expr)
               ((kPrimaryToOperand . getSecondKPrimary) expr)
               []
@@ -53,8 +51,6 @@ kExpressionToBasicBlock expr =
 kExpressionToLInstruction :: KExpression -> Instruction
 kExpressionToLInstruction expr =
     ((binOpConvert . getBinOp) expr)
-        False
-        False
         ((kPrimaryToOperand . getFirstKPrimary) expr)
         ((kPrimaryToOperand . getSecondKPrimary) expr)
         []
@@ -79,7 +75,7 @@ kLiteralToLOperand :: KLiteral -> Operand
 kLiteralToLOperand (KDecimalConst x) = ConstantOperand (C.Int 32 (toInteger x))
 kLiteralToLOperand (KDoubleConst x) = ConstantOperand (C.Float (F.Single (realToFrac x)))
 
-binOpConvert :: KBinOp -> Bool -> Bool -> Operand -> Operand -> InstructionMetadata -> Instruction
-binOpConvert KBinOpLess = AST.Sub
-binOpConvert KBinOpPlus = AST.Add
-binOpConvert KBinOpMul = AST.Mul
+binOpConvert :: KBinOp -> Operand -> Operand -> InstructionMetadata -> Instruction
+binOpConvert KBinOpLess = AST.Sub False False
+binOpConvert KBinOpPlus = AST.Add False False
+binOpConvert KBinOpMul = AST.Mul False False
