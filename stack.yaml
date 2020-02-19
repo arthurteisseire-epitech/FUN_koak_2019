@@ -18,7 +18,7 @@
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
 #resolver: lts-15.0
-resolver: lts-14.27
+resolver: lts-12.18
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -67,8 +67,8 @@ packages:
 # compiler-check: newer-minor
 
 extra-deps:
-  - llvm-hs-9.0.0
-  - llvm-hs-pure-9.0.0
+  - llvm-hs-6.0.0
+  - llvm-hs-pure-6.0.0
 
 flags:
   llvm-hs:
@@ -76,5 +76,5 @@ flags:
 
 nix:
   enable: true
-  packages: [llvm_9]
+  packages: [llvm_6]
 
