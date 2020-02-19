@@ -20,6 +20,21 @@ import           LLVM.Target
 
 import           Data.Maybe
 
+kCallToLLVMCall :: KPostfix -> Instruction
+kCallToLLVMCall (KFuncCall (KIdentifier identifier) _) =
+    AST.Call
+        Nothing
+        AST.C
+        []
+        (Right
+             (ConstantOperand
+                  (C.GlobalReference
+                       (PointerType (FunctionType AST.i32 [AST.i32, AST.i32] False) (AST.AddrSpace 0))
+                       (mkName identifier))))
+        []
+        []
+        []
+
 kDefToGlobalDef :: KStmt -> Definition
 kDefToGlobalDef (KStmt [KDefs (KPrototype funcName (KPrototypeArgs args KIntType)) (KListExpr [expr])]) =
     GlobalDefinition

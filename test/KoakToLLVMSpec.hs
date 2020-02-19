@@ -95,3 +95,18 @@ spec = do
                                 (Do $ Ret (Just $ LocalReference AST.i32 (Name "res")) [])
                           ]
                     }
+    describe "call function" $
+        it "test call function without args" $
+        kCallToLLVMCall (KFuncCall (KIdentifier "ret1") (KCallExpr [])) `shouldBe`
+        AST.Call
+            Nothing
+            AST.C
+            []
+            (Right
+                 (ConstantOperand
+                      (C.GlobalReference
+                           (PointerType (FunctionType AST.i32 [AST.i32, AST.i32] False) (AST.AddrSpace 0))
+                           (Name "ret1"))))
+            []
+            []
+            []
