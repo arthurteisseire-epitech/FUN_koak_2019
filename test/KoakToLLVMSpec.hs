@@ -95,18 +95,38 @@ spec = do
                                 (Do $ Ret (Just $ LocalReference AST.i32 (Name "res")) [])
                           ]
                     }
-    describe "call function" $
+    describe "call function" $ do
         it "test call function without args" $
-        kCallToLLVMCall (KFuncCall (KIdentifier "ret1") (KCallExpr [])) `shouldBe`
-        AST.Call
-            Nothing
-            AST.C
-            []
-            (Right
-                 (ConstantOperand
-                      (C.GlobalReference
-                           (PointerType (FunctionType AST.i32 [AST.i32, AST.i32] False) (AST.AddrSpace 0))
-                           (Name "ret1"))))
-            []
-            []
-            []
+            kCallToLLVMCall (KFuncCall (KIdentifier "ret1") (KCallExpr [])) `shouldBe`
+            AST.Call
+                Nothing
+                AST.C
+                []
+                (Right
+                     (ConstantOperand
+                          (C.GlobalReference
+                               (PointerType (FunctionType AST.i32 [] False) (AST.AddrSpace 0))
+                               (Name "ret1"))))
+                []
+                []
+                []
+        it "test call function with args" $
+            kCallToLLVMCall
+                (KFuncCall
+                     (KIdentifier "add")
+                     (KCallExpr
+                          [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) []
+                          , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4) []
+                          ])) `shouldBe`
+            AST.Call
+                Nothing
+                AST.C
+                []
+                (Right
+                     (ConstantOperand
+                          (C.GlobalReference
+                               (PointerType (FunctionType AST.i32 [AST.i32, AST.i32] False) (AST.AddrSpace 0))
+                               (Name "add"))))
+                [(ConstantOperand (C.Int 32 2), []), (ConstantOperand (C.Int 32 4), [])]
+                []
+                []

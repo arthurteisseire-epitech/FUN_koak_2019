@@ -21,7 +21,7 @@ import           LLVM.Target
 import           Data.Maybe
 
 kCallToLLVMCall :: KPostfix -> Instruction
-kCallToLLVMCall (KFuncCall (KIdentifier identifier) _) =
+kCallToLLVMCall (KFuncCall (KIdentifier identifier) (KCallExpr args)) =
     AST.Call
         Nothing
         AST.C
@@ -29,11 +29,16 @@ kCallToLLVMCall (KFuncCall (KIdentifier identifier) _) =
         (Right
              (ConstantOperand
                   (C.GlobalReference
-                       (PointerType (FunctionType AST.i32 [AST.i32, AST.i32] False) (AST.AddrSpace 0))
+                       (PointerType (FunctionType AST.i32 getReturnTypes False) (AST.AddrSpace 0))
                        (mkName identifier))))
+        (map (\arg -> (exprToFirstOperand arg, [])) args)
         []
         []
-        []
+  where
+    getReturnTypes = map (const AST.i32) args
+
+exprToFirstOperand :: KExpression -> Operand
+exprToFirstOperand = kPrimaryToOperand . getFirstKPrimary
 
 kDefToGlobalDef :: KStmt -> Definition
 kDefToGlobalDef (KStmt [KDefs (KPrototype funcName (KPrototypeArgs args KIntType)) (KListExpr [expr])]) =
