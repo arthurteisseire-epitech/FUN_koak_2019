@@ -36,7 +36,6 @@ llvmTestModule def = defaultModule {moduleName = "main", moduleDefinitions = def
 printLLVM :: AST.Module -> IO ()
 printLLVM m =
     withContext $ \ctx -> do
-        putStrLn "here"
         llvm <- withModuleFromAST ctx m moduleLLVMAssembly
         BS.putStrLn llvm
 --            withModuleFromAST ctx llvmTestMain (writeBitcodeToFile $ File "test.ll")
