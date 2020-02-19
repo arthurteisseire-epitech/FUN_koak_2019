@@ -20,6 +20,8 @@ import           LLVM.Target
 
 import           Data.Maybe
 
+import Debug.Trace
+
 koakToLLVM :: KStmt -> [Definition]
 koakToLLVM (KStmt defs) = map kDefToGlobalDef defs
 
@@ -60,8 +62,20 @@ kReturnTypeToLReturnType :: KType -> Type
 kReturnTypeToLReturnType KIntType = AST.i32
 
 kExpressionToBasicBlock :: KExpression -> BasicBlock
-kExpressionToBasicBlock expr@(KExpression _ []) =
-    BasicBlock (Name "entry") [] (Do $ Ret (Just $ (kPrimaryToOperand . getFirstKPrimary) expr) [])
+kExpressionToBasicBlock expr@(KExpression (KPostfix (KPrimary primary)) []) =
+    BasicBlock
+        (Name "entry")
+        []
+        (Do $ Ret (Just
+            ((kPrimaryToOperand . getFirstKPrimary) expr)) [])
+
+kExpressionToBasicBlock expr@(KExpression (KPostfix call@(KFuncCall _ _)) _) =
+    BasicBlock
+        (Name "entry")
+        ["callRes" := kCallToLLVMCall call]
+        (Do $ Ret (Just $
+            LocalReference AST.i32 (Name "callRes")) [])
+
 kExpressionToBasicBlock expr =
     BasicBlock
         (Name "entry")

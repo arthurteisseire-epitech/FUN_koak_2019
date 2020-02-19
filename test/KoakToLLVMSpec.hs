@@ -32,7 +32,8 @@ spec = do
             kExpressionToBasicBlock
                 (KExpression
                      ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1)
-                     [(KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)]) `shouldBe`
+                     [(KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)])
+            `shouldBe`
             BasicBlock
                 (Name "entry")
                 [Name "res" := AST.Sub False False (ConstantOperand (C.Int 32 1)) (ConstantOperand (C.Int 32 2)) []]
@@ -153,14 +154,14 @@ spec = do
                 ]) `shouldBe`
                         [GlobalDefinition
                             functionDefaults
-                                { name = Name "add'"
+                                { name = Name "add"
                                 , parameters = ([Parameter AST.i32 (Name "x") [], Parameter AST.i32 (Name "y") []], False)
                                 , returnType = AST.i32
                                 , basicBlocks =
                                       [ BasicBlock
                                             (Name "entry")
                                             [ Name "res" :=
-                                              AST.Sub
+                                              AST.Add
                                                   False
                                                   False
                                                   (LocalReference AST.i32 (Name "x"))
@@ -178,7 +179,7 @@ spec = do
                                  , basicBlocks =
                                        [ BasicBlock
                                              (Name "entry")
-                                             [ Name "res" :=
+                                             [ Name "callRes" :=
                                                     AST.Call
                                                         Nothing
                                                         AST.C
@@ -187,11 +188,11 @@ spec = do
                                                             (ConstantOperand
                                                                   (C.GlobalReference
                                                                        (PointerType (FunctionType AST.i32 [AST.i32, AST.i32] False) (AST.AddrSpace 0))
-                                                                       (Name "add'"))))
+                                                                       (Name "add"))))
                                                         [(ConstantOperand (C.Int 32 3), []), (ConstantOperand (C.Int 32 4), [])]
                                                         []
                                                         []
                                              ]
-                                             (Do $ Ret (Just $ LocalReference AST.i32 (Name "res")) [])
+                                             (Do $ Ret (Just $ LocalReference AST.i32 (Name "callRes")) [])
                                        ]
                                  }]
