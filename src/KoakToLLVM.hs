@@ -79,3 +79,4 @@ binOpConvert :: KBinOp -> Operand -> Operand -> InstructionMetadata -> Instructi
 binOpConvert KBinOpLess = AST.Sub False False
 binOpConvert KBinOpPlus = AST.Add False False
 binOpConvert KBinOpMul = AST.Mul False False
+binOpConvert KBinOpDiv = AST.SDiv False
