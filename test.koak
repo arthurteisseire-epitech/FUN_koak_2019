@@ -1,0 +1,1 @@
+def add(x:int y:int):int x+y; def main():int add(3,4);
