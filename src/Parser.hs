@@ -21,7 +21,7 @@ applyParser parser s
 
 parseStmt :: ReadP KStmt
 parseStmt = do
-    stmt <- sepBy1 parseKDefs (char ' ')
+    stmt <- sepBy1 parseKDefs ((many . oneOf) " \n")
     return $ KStmt stmt
 
 parseKDefs :: ReadP KDefs
@@ -146,7 +146,9 @@ parseLiteral = (KDoubleConst . readDouble <$> checkParseDouble) <|> (KDecimalCon
 parseBinOp :: ReadP KBinOp
 parseBinOp =
     (string "+" >> return KBinOpPlus) <|> (string "-" >> return KBinOpLess) <|> (string "*" >> return KBinOpMul) <|>
-    (string "/" >> return KBinOpDiv) <|> (string "<" >> return KBinOpInf) <|> (string "=" >> return KBinOpAssign)
+    (string "/" >> return KBinOpDiv) <|>
+    (string "<" >> return KBinOpInf) <|>
+    (string "=" >> return KBinOpAssign)
 
 parseUnOp :: ReadP KUnOp
 parseUnOp = (string "!" >> return KUnOpNot) <|> (string "-" >> return KUnOpLess)

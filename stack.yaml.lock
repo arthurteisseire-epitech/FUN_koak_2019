@@ -5,22 +5,22 @@
 
 packages:
 - completed:
-    hackage: llvm-hs-9.0.0@sha256:b036b8d3a78607310382f82b7c5303ffc31afb9735875bb64521501144cc5728,8700
+    hackage: llvm-hs-6.0.0@sha256:b86fd34481b151486a8fa6647c955bceb188ab8015e8069b3d2e3e8169dc87ae,8886
     pantry-tree:
-      size: 13599
-      sha256: d572dd639dd315c94eccdfd9b10a3c266163cf945778141087a003c1ed836a91
+      size: 12671
+      sha256: a86b71cebb3626b433618420898c308bbe73c38e88c039070b98d21560541127
   original:
-    hackage: llvm-hs-9.0.0
+    hackage: llvm-hs-6.0.0
 - completed:
-    hackage: llvm-hs-pure-9.0.0@sha256:134779f40086a366279f678e670b610d7a7618b28dd43f65894078fd20e04629,2945
+    hackage: llvm-hs-pure-6.0.0@sha256:63e5e91dd24b66b52311dc109bdc94ac6a773d60d07977d61c3b2626e4672d16,3666
     pantry-tree:
-      size: 2600
-      sha256: f1a83aa959b69b72342997fc4fdc352086bc3b9f306cfb6a4c8bbc850d36b4fb
+      size: 2588
+      sha256: 38f8bc8d5a7be50a0d7d14198b094da1661ce00fb3023f4968d0a5f29cc681c4
   original:
-    hackage: llvm-hs-pure-9.0.0
+    hackage: llvm-hs-pure-6.0.0
 snapshots:
 - completed:
-    size: 524996
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/14/27.yaml
-    sha256: 7ea31a280c56bf36ff591a7397cc384d0dff622e7f9e4225b47d8980f019a0f0
-  original: lts-14.27
+    size: 506303
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/12/18.yaml
+    sha256: 44c58c3e2bfc57455cb54ce3860847aaf69d9ee11baad238d7d0a82b7034a474
+  original: lts-12.18
