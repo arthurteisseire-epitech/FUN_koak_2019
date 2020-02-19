@@ -27,12 +27,12 @@ import           KoakToLLVM
 import           Parser
 
 main :: IO ()
-main = getArgs >>= interpretFile . head >>= printLLVM . llvmTestModule
+main = getArgs >>= mapM interpretFile >>= mapM_ (printLLVM . llvmTestModule)
 
 interpretFile :: String -> IO Definition
 interpretFile filename = openFile filename ReadMode >>= hGetContents >>= srcToDef
 
-srcToDef :: String -> Definition
+srcToDef :: String -> IO Definition
 srcToDef src = kDefToGlobalDef <$> parse src
   where
     parse src =
