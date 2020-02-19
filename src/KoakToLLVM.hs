@@ -81,3 +81,5 @@ kLiteralToLOperand (KDoubleConst x) = ConstantOperand (C.Float (F.Single (realTo
 
 binOpConvert :: KBinOp -> Bool -> Bool -> Operand -> Operand -> InstructionMetadata -> Instruction
 binOpConvert KBinOpLess = AST.Sub
+binOpConvert KBinOpPlus = AST.Add
+binOpConvert KBinOpMul = AST.Mul
