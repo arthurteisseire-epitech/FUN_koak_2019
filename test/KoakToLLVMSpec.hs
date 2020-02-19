@@ -32,7 +32,7 @@ spec = do
             kExpressionToBasicBlock
                 (KExpression
                      ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1)
-                     [(KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)])
+                     [(KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)]) 
             `shouldBe`
             BasicBlock
                 (Name "entry")
@@ -42,13 +42,13 @@ spec = do
         it "test function main definition" $
             kDefToGlobalDef
                 (KDefs
-                    (KPrototype "main" (KPrototypeArgs [] KIntType))
-                    (KListExpr
-                            [ KExpression
-                                 ((KPostfix . KPrimary . KLiteral . KDecimalConst) 44)
-                                 [(KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)]
-                            ])
-                     ) `shouldBe`
+                     (KPrototype "main" (KPrototypeArgs [] KIntType))
+                     (KListExpr
+                          [ KExpression
+                                ((KPostfix . KPrimary . KLiteral . KDecimalConst) 44)
+                                [(KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)]
+                          ])) 
+            `shouldBe`
             GlobalDefinition
                 functionDefaults
                     { name = Name "main"
@@ -66,15 +66,15 @@ spec = do
         it "test function with args" $
             kDefToGlobalDef
                 (KDefs
-                       (KPrototype
-                            "sub"
-                            (KPrototypeArgs [KPrototypeArg "a" KIntType, KPrototypeArg "b" KIntType] KIntType))
-                       (KListExpr
-                            [ KExpression
-                                  ((KPostfix . KPrimary . KIdentifier) "a")
-                                  [(KBinOpLess, (KPostfix . KPrimary . KIdentifier) "b")]
-                            ])
-                     ) `shouldBe`
+                     (KPrototype
+                          "sub"
+                          (KPrototypeArgs [KPrototypeArg "a" KIntType, KPrototypeArg "b" KIntType] KIntType))
+                     (KListExpr
+                          [ KExpression
+                                ((KPostfix . KPrimary . KIdentifier) "a")
+                                [(KBinOpLess, (KPostfix . KPrimary . KIdentifier) "b")]
+                          ])) 
+            `shouldBe`
             GlobalDefinition
                 functionDefaults
                     { name = Name "sub"
@@ -96,7 +96,8 @@ spec = do
                     }
     describe "call function" $ do
         it "test call function without args" $
-            kCallToLLVMCall (KFuncCall (KIdentifier "ret1") (KCallExpr [])) `shouldBe`
+            kCallToLLVMCall (KFuncCall (KIdentifier "ret1") (KCallExpr [])) 
+            `shouldBe`
             AST.Call
                 Nothing
                 AST.C
@@ -116,83 +117,92 @@ spec = do
                      (KCallExpr
                           [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) []
                           , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4) []
-                          ])) `shouldBe`
-                AST.Call
-                    Nothing
-                    AST.C
-                    []
-                    (Right
-                         (ConstantOperand
-                              (C.GlobalReference
-                                   (PointerType (FunctionType AST.i32 [AST.i32, AST.i32] False) (AST.AddrSpace 0))
-                                   (Name "add"))))
-                    [(ConstantOperand (C.Int 32 2), []), (ConstantOperand (C.Int 32 4), [])]
-                    []
-                    []
+                          ])) 
+            `shouldBe`
+            AST.Call
+                Nothing
+                AST.C
+                []
+                (Right
+                     (ConstantOperand
+                          (C.GlobalReference
+                               (PointerType (FunctionType AST.i32 [AST.i32, AST.i32] False) (AST.AddrSpace 0))
+                               (Name "add"))))
+                [(ConstantOperand (C.Int 32 2), []), (ConstantOperand (C.Int 32 4), [])]
+                []
+                []
     describe "function definition calling an other one" $
         it "test call function with args from main" $
         koakToLLVM
             (KStmt
-                [
-                KDefs
-                    (KPrototype "add" (KPrototypeArgs [KPrototypeArg "x" KIntType,KPrototypeArg "y" KIntType] KIntType))
-                    (KListExpr [KExpression (KPostfix (KPrimary (KIdentifier "x"))) [(KBinOpPlus,KPostfix (KPrimary (KIdentifier "y")))]]),
-                KDefs
-                    (KPrototype "main" (KPrototypeArgs [] KIntType))
-                    (KListExpr
-                        [
-                            KExpression (KPostfix (
-                                KFuncCall
-                                    (KIdentifier "add")
-                                    (KCallExpr
-                                        [
-                                            KExpression (KPostfix (KPrimary (KLiteral (KDecimalConst 3)))) [],
-                                            KExpression (KPostfix (KPrimary (KLiteral (KDecimalConst 4)))) []
-                                        ]))) []
+                 [ KDefs
+                       (KPrototype
+                            "add"
+                            (KPrototypeArgs [KPrototypeArg "x" KIntType, KPrototypeArg "y" KIntType] KIntType))
+                       (KListExpr
+                            [ KExpression
+                                  (KPostfix (KPrimary (KIdentifier "x")))
+                                  [(KBinOpPlus, KPostfix (KPrimary (KIdentifier "y")))]
+                            ])
+                 , KDefs
+                       (KPrototype "main" (KPrototypeArgs [] KIntType))
+                       (KListExpr
+                            [ KExpression
+                                  (KPostfix
+                                       (KFuncCall
+                                            (KIdentifier "add")
+                                            (KCallExpr
+                                                 [ KExpression (KPostfix (KPrimary (KLiteral (KDecimalConst 3)))) []
+                                                 , KExpression (KPostfix (KPrimary (KLiteral (KDecimalConst 4)))) []
+                                                 ])))
+                                  []
+                            ])
+                 ]) 
+        `shouldBe`
+        [ GlobalDefinition
+              functionDefaults
+                  { name = Name "add"
+                  , parameters = ([Parameter AST.i32 (Name "x") [], Parameter AST.i32 (Name "y") []], False)
+                  , returnType = AST.i32
+                  , basicBlocks =
+                        [ BasicBlock
+                              (Name "entry")
+                              [ Name "res" :=
+                                AST.Add
+                                    False
+                                    False
+                                    (LocalReference AST.i32 (Name "x"))
+                                    (LocalReference AST.i32 (Name "y"))
+                                    []
+                              ]
+                              (Do $ Ret (Just $ LocalReference AST.i32 (Name "res")) [])
                         ]
-                    )
-                ]) `shouldBe`
-                        [GlobalDefinition
-                            functionDefaults
-                                { name = Name "add"
-                                , parameters = ([Parameter AST.i32 (Name "x") [], Parameter AST.i32 (Name "y") []], False)
-                                , returnType = AST.i32
-                                , basicBlocks =
-                                      [ BasicBlock
-                                            (Name "entry")
-                                            [ Name "res" :=
-                                              AST.Add
-                                                  False
-                                                  False
-                                                  (LocalReference AST.i32 (Name "x"))
-                                                  (LocalReference AST.i32 (Name "y"))
-                                                  []
-                                            ]
-                                            (Do $ Ret (Just $ LocalReference AST.i32 (Name "res")) [])
-                                      ]
-                                }
-                        ,GlobalDefinition
-                             functionDefaults
-                                 { name = Name "main"
-                                 , parameters = ([], False)
-                                 , returnType = AST.i32
-                                 , basicBlocks =
-                                       [ BasicBlock
-                                             (Name "entry")
-                                             [ Name "callRes" :=
-                                                    AST.Call
-                                                        Nothing
-                                                        AST.C
-                                                        []
-                                                        (Right
-                                                            (ConstantOperand
-                                                                  (C.GlobalReference
-                                                                       (PointerType (FunctionType AST.i32 [AST.i32, AST.i32] False) (AST.AddrSpace 0))
-                                                                       (Name "add"))))
-                                                        [(ConstantOperand (C.Int 32 3), []), (ConstantOperand (C.Int 32 4), [])]
-                                                        []
-                                                        []
-                                             ]
-                                             (Do $ Ret (Just $ LocalReference AST.i32 (Name "callRes")) [])
-                                       ]
-                                 }]
+                  }
+        , GlobalDefinition
+              functionDefaults
+                  { name = Name "main"
+                  , parameters = ([], False)
+                  , returnType = AST.i32
+                  , basicBlocks =
+                        [ BasicBlock
+                              (Name "entry")
+                              [ Name "callRes" :=
+                                AST.Call
+                                    Nothing
+                                    AST.C
+                                    []
+                                    (Right
+                                         (ConstantOperand
+                                              (C.GlobalReference
+                                                   (PointerType
+                                                        (FunctionType AST.i32 [AST.i32, AST.i32] False)
+                                                        (AST.AddrSpace 0))
+                                                   (Name "add"))))
+                                    [(ConstantOperand (C.Int 32 3), []), (ConstantOperand (C.Int 32 4), [])]
+                                    []
+                                    []
+                              ]
+                              (Do $ Ret (Just $ LocalReference AST.i32 (Name "callRes")) [])
+                        ]
+                  }
+        ]
