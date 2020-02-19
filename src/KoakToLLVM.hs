@@ -20,7 +20,6 @@ import           LLVM.Target
 
 import           Data.Maybe
 
-import Debug.Trace
 
 koakToLLVM :: KStmt -> [Definition]
 koakToLLVM (KStmt defs) = map kDefToGlobalDef defs

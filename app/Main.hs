@@ -17,7 +17,7 @@ import           KoakToLLVM
 import           Parser
 
 main :: IO ()
-main = getArgs >>= mapM interpretFile >>= mapM_ (mapM_ (printLLVM . llvmTestModule))
+main = getArgs >>= mapM interpretFile >>= mapM_ (printLLVM . llvmTestModule)
 
 interpretFile :: String -> IO [Definition]
 interpretFile filename = openFile filename ReadMode >>= hGetContents >>= srcToDef
@@ -30,12 +30,13 @@ srcToDef src = koakToLLVM <$> parse src
             Left errorMsg -> putStrLn errorMsg >> exitWith (ExitFailure 84)
             Right koakAst -> pure koakAst
 
-llvmTestModule :: Definition -> AST.Module
-llvmTestModule def = defaultModule {moduleName = "main", moduleDefinitions = [def]}
+llvmTestModule :: [Definition] -> AST.Module
+llvmTestModule def = defaultModule {moduleName = "main", moduleDefinitions = def}
 
 printLLVM :: AST.Module -> IO ()
 printLLVM m =
     withContext $ \ctx -> do
+        putStrLn "here"
         llvm <- withModuleFromAST ctx m moduleLLVMAssembly
         BS.putStrLn llvm
 --            withModuleFromAST ctx llvmTestMain (writeBitcodeToFile $ File "test.ll")
