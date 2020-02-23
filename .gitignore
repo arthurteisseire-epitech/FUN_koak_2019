@@ -1,6 +1,10 @@
 .stack-work/
-project.cabal
 *~
 .idea
 out
 koak
+mini
+ideaHaskellLib
+*.ll
+*.o
+*.out

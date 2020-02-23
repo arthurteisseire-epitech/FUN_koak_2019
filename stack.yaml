@@ -17,6 +17,7 @@
 #
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
+#resolver: lts-15.0
 resolver: lts-12.18
 
 # User packages to be built.
@@ -64,3 +65,16 @@ packages:
 #
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
+
+extra-deps:
+  - llvm-hs-6.0.0
+  - llvm-hs-pure-6.0.0
+
+flags:
+  llvm-hs:
+    shared-llvm: true
+
+nix:
+  enable: true
+  packages: [llvm_6]
+
