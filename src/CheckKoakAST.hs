@@ -1,7 +1,6 @@
 module CheckKoakAST where
 
 import           Data.Maybe
-import           Debug.Trace
 import           KoakAST
 
 checkKoakAST :: KStmt -> Either String KStmt
@@ -12,9 +11,9 @@ checkKoakAST stmt -- TODO : check same identifier between funcCall and prototype
     isValid = checkFuncCallsMatchPrototypes stmt
 
 checkFuncCallsMatchPrototypes :: KStmt -> Bool
-checkFuncCallsMatchPrototypes stmt = all (checkFuncCallMatchPrototypes stmt) (findFuncCalls stmt)
+checkFuncCallsMatchPrototypes stmt = all checkFuncCallMatchPrototypes (findFuncCalls stmt)
   where
-    checkFuncCallMatchPrototypes stmt funcCall = any (checkFuncCallMatchPrototype funcCall) (findPrototypes stmt)
+    checkFuncCallMatchPrototypes funcCall = any (checkFuncCallMatchPrototype funcCall) (findPrototypes stmt)
     checkFuncCallMatchPrototype (KFuncCall (KIdentifier funcCallId) _) (KPrototype protoId _) = funcCallId == protoId
     checkFuncCallMatchPrototype _ _ = False
 
