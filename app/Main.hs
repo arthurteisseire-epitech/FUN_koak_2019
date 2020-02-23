@@ -20,15 +20,13 @@ main :: IO ()
 main = getArgs >>= mapM interpretFile >>= mapM_ (printLLVM . llvmTestModule)
 
 interpretFile :: String -> IO [Definition]
-interpretFile filename = openFile filename ReadMode >>= hGetContents >>= srcToDef
+interpretFile filename = openFile filename ReadMode >>= hGetContents >>= srcToDefM
 
-srcToDef :: String -> IO [Definition]
-srcToDef src = koakToLLVM <$> parse src
-  where
-    parse s =
-        case parseKoak s of
-            Left errorMsg -> putStrLn errorMsg >> exitWith (ExitFailure 84)
-            Right koakAst -> pure koakAst
+srcToDefM :: String -> IO [Definition]
+srcToDefM s = either dieWithMsg pure (srcToDef s)
+
+srcToDef :: String -> Either String [Definition]
+srcToDef s = koakToLLVM <$> parseKoak s
 
 llvmTestModule :: [Definition] -> AST.Module
 llvmTestModule def = defaultModule {moduleName = "main", moduleDefinitions = def}
@@ -40,3 +38,6 @@ printLLVM m =
         BS.putStrLn llvm
 --            withModuleFromAST ctx llvmTestMain (writeBitcodeToFile $ File "test.ll")
 --            withModuleFromAST ctx llvmTestOp (writeBitcodeToFile $ File "op.ll")
+
+dieWithMsg :: String -> IO a
+dieWithMsg s = putStrLn s >> exitWith (ExitFailure 84)
