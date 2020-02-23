@@ -10,22 +10,13 @@ import           LLVM.AST.CallingConvention as AST
 import           LLVM.AST.Constant          as C
 import           LLVM.AST.Float             as F
 import           LLVM.AST.Global
-import           LLVM.AST.IntegerPredicate  as AST
 import           LLVM.AST.Type              as AST
-
-import           LLVM.Context
-import           LLVM.Module
-import           LLVM.Prelude
-import           LLVM.Target
-
-import           Data.Maybe
-
 
 koakToLLVM :: KStmt -> [Definition]
 koakToLLVM (KStmt defs) = map kDefToGlobalDef defs
 
 kCallToLLVMCall :: KPostfix -> Instruction
-kCallToLLVMCall (KFuncCall (KIdentifier identifier) (KCallExpr args)) =
+kCallToLLVMCall (KFuncCall (KIdentifier identifier) (KCallExpr params)) =
     AST.Call
         Nothing
         AST.C
@@ -35,21 +26,21 @@ kCallToLLVMCall (KFuncCall (KIdentifier identifier) (KCallExpr args)) =
                   (C.GlobalReference
                        (PointerType (FunctionType AST.i32 getReturnTypes False) (AST.AddrSpace 0))
                        (mkName identifier))))
-        (map (\arg -> (exprToFirstOperand arg, [])) args)
+        (map (\param -> (exprToFirstOperand param, [])) params)
         []
         []
   where
-    getReturnTypes = map (const AST.i32) args
+    getReturnTypes = map (const AST.i32) params
 
 exprToFirstOperand :: KExpression -> Operand
 exprToFirstOperand = kPrimaryToOperand . getFirstKPrimary
 
 kDefToGlobalDef :: KDefs -> Definition
-kDefToGlobalDef (KDefs (KPrototype funcName (KPrototypeArgs args KIntType)) (KListExpr exprs)) =
+kDefToGlobalDef (KDefs (KPrototype funcName (KPrototypeArgs params KIntType)) (KListExpr exprs)) =
     GlobalDefinition
         functionDefaults
             { name = mkName funcName
-            , parameters = (kArgsToLArgs args, False)
+            , parameters = (kArgsToLArgs params, False)
             , returnType = AST.i32
             , basicBlocks = map kExpressionToBasicBlock exprs
             }
@@ -61,14 +52,14 @@ kReturnTypeToLReturnType :: KType -> Type
 kReturnTypeToLReturnType KIntType = AST.i32
 
 kExpressionToBasicBlock :: KExpression -> BasicBlock
-kExpressionToBasicBlock expr@(KExpression (KPostfix (KPrimary primary)) []) =
+kExpressionToBasicBlock expr@(KExpression (KPostfix (KPrimary _)) []) =
     BasicBlock
         (Name "entry")
         []
         (Do $ Ret (Just
             ((kPrimaryToOperand . getFirstKPrimary) expr)) [])
 
-kExpressionToBasicBlock expr@(KExpression (KPostfix call@(KFuncCall _ _)) _) =
+kExpressionToBasicBlock (KExpression (KPostfix call@(KFuncCall _ _)) _) =
     BasicBlock
         (Name "entry")
         ["callRes" := kCallToLLVMCall call]

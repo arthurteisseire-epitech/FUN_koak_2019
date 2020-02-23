@@ -1,7 +1,6 @@
 module ParseUtils where
 
 import           Control.Applicative          ((<|>), liftA2)
-import           Control.Monad                (liftM2)
 import           Data.Char
 import           Text.ParserCombinators.ReadP
 
@@ -41,5 +40,5 @@ sepByPairHelper :: ReadP a -> ReadP sep -> ReadP [(sep, a)]
 sepByPairHelper parser sep = do
     s <- sep
     p <- parser
-    e <- (sepByPairHelper parser sep) <|> return []
+    e <- sepByPairHelper parser sep <|> return []
     return $ (s, p) : e

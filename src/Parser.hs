@@ -2,8 +2,7 @@ module Parser
     ( parseKoak
     ) where
 
-import           Control.Applicative          (Alternative, (<|>))
-import           Control.Monad
+import           Control.Applicative          ((<|>))
 import           Data.Char
 import           KoakAST
 import           ParseUtils
@@ -30,7 +29,7 @@ parseKDefs = (string "def " *> parseDefs <* char ';') <|> (KExpressions <$> pars
 parseDefs :: ReadP KDefs
 parseDefs = do
     prototype <- parsePrototype
-    char ' '
+    _ <- char ' '
     expressions <- parseExpressions
     return $ KDefs prototype expressions
 
@@ -42,16 +41,16 @@ parsePrototype = do
 
 parsePrototypeArgs :: ReadP KPrototypeArgs
 parsePrototypeArgs = do
-    char '('
+    _ <- char '('
     args <- sepBy parsePrototypeArg (char ' ')
-    string "):"
+    _ <- string "):"
     returnType <- parseType
     return $ KPrototypeArgs args returnType
 
 parsePrototypeArg :: ReadP KPrototypeArg
 parsePrototypeArg = do
     identifier <- parseIdentifier
-    char ':'
+    _ <- char ':'
     argType <- parseType
     return $ KPrototypeArg identifier argType
 
@@ -65,28 +64,28 @@ parseExpressions = parseListExpr <|> parseIfElse <|> parseIf <|> parseWhile <|> 
 
 parseFor :: ReadP KExpressions
 parseFor = do
-    string "for "
+    _ <- string "for "
     assign <- parseExpression
-    char ','
+    _ <- char ','
     condition <- parseExpression
-    char ','
+    _ <- char ','
     increment <- parseExpression
-    string " in "
+    _ <- string " in "
     inExpr <- parseExpressions
     return $ KFor assign condition increment inExpr
 
 parseWhile :: ReadP KExpressions
 parseWhile = do
-    string "while "
+    _ <- string "while "
     condition <- parseExpression
-    string " do "
+    _ <- string " do "
     doExpr <- parseExpressions
     return $ KWhile condition doExpr
 
 parseIfElse :: ReadP KExpressions
 parseIfElse = do
     (condition, thenExpr) <- parseIfThen
-    string " else "
+    _ <- string " else "
     elseExpr <- parseExpressions
     return $ KIfElse condition thenExpr elseExpr
 
@@ -97,9 +96,9 @@ parseIf = do
 
 parseIfThen :: ReadP (KExpression, KExpressions)
 parseIfThen = do
-    string "if "
+    _ <- string "if "
     condition <- parseExpression
-    string " then "
+    _ <- string " then "
     thenExpr <- parseExpressions
     return (condition, thenExpr)
 
@@ -124,17 +123,17 @@ parsePostfix = do
 
 parseCallExpr :: ReadP KCallExpr
 parseCallExpr = do
-    char '('
+    _ <- char '('
     expressions <- sepBy1 parseExpression (char ',')
-    char ')'
+    _ <- char ')'
     return . KCallExpr $ expressions
 
 parsePrimary :: ReadP KPrimary
 parsePrimary =
     (KIdentifier <$> parseIdentifier) <|> (KLiteral <$> parseLiteral) <|>
-    (do char '('
+    (do _ <- char '('
         exprs <- parseExpressions
-        char ')'
+        _ <- char ')'
         return (KPrimaryExpressions exprs))
 
 parseIdentifier :: ReadP KIdentifier
