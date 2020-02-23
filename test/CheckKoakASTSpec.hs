@@ -10,7 +10,7 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = 
+spec =
     describe "identifier error" $ do
         it "call function without prototype" $
             parseAndCheckKoak "add(1,2);" `shouldSatisfy` isLeft

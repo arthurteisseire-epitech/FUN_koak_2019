@@ -140,7 +140,7 @@ parseIdentifier :: ReadP KIdentifier
 parseIdentifier = satisfy isAlpha <:> munch isAlphaNum
 
 parseLiteral :: ReadP KLiteral
-parseLiteral = (KDoubleConst . readDouble <$> checkParseDouble) <|> (KDecimalConst . readInt <$> checkParseInt)
+parseLiteral = (KDoubleConst . read <$> checkParseDouble) <|> (KDecimalConst . read <$> checkParseInt)
 
 parseBinOp :: ReadP KBinOp
 parseBinOp =
@@ -151,9 +151,3 @@ parseBinOp =
 
 parseUnOp :: ReadP KUnOp
 parseUnOp = (string "!" >> return KUnOpNot) <|> (string "-" >> return KUnOpLess)
-
-readInt :: String -> Int
-readInt = read
-
-readDouble :: String -> Double
-readDouble = read
