@@ -84,37 +84,37 @@ kExpressionToBasicBlock (KExpression (KPostfix call@(KFuncCall _ _)) _) =
         (Do $ Ret (Just $
             LocalReference AST.i32 (Name "callRes")) [])
 
-kExpressionToBasicBlock expr =
+kExpressionToBasicBlock expr@(KExpression firstUnary pairs) =
     BasicBlock
         (Name "entry")
-        [ Name "res" :=
-          (binOpConvert . getBinOp)
+        ([ UnName 0 :=
+          (binOpConvert . getFirstBinOp)
               expr
               ((kPrimaryToOperand . getFirstKPrimary) expr)
               ((kPrimaryToOperand . getSecondKPrimary) expr)
               []
-        ]
-        (Do $ Ret (Just $ LocalReference AST.i32 (Name "res")) [])
+        ] ++ map binOpUnaryPairToNamedInstruction (zip [0..] (tail pairs)))
+        (Do $ Ret (Just $ LocalReference AST.i32 (UnName . fromIntegral $ length pairs - 1)) [])
 
-getBinOp :: KExpression -> KBinOp
-getBinOp (KExpression _ [(binOp, _)]) = binOp
+binOpUnaryPairToNamedInstruction :: (Word, (KBinOp, KUnary)) -> Named Instruction
+binOpUnaryPairToNamedInstruction (idx, (binOp, (KPostfix (KPrimary primary)))) =
+    UnName (idx + 1) := (binOpConvert binOp) (LocalReference AST.i32 (UnName idx)) (kPrimaryToOperand primary) []
 
 getFirstKPrimary :: KExpression -> KPrimary
 getFirstKPrimary (KExpression (KPostfix (KPrimary primary)) _) = primary
 
 getSecondKPrimary :: KExpression -> KPrimary
-getSecondKPrimary (KExpression _ [(_, KPostfix (KPrimary primary))]) = primary
-
-getValueFromPostfix :: KPostfix -> KLiteral
-getValueFromPostfix (KPrimary (KLiteral x)) = x
+getSecondKPrimary (KExpression _ ((_, KPostfix (KPrimary primary)):_)) = primary
 
 kPrimaryToOperand :: KPrimary -> Operand
-kPrimaryToOperand (KLiteral literal) = kLiteralToLOperand literal
 kPrimaryToOperand (KIdentifier identifier) = LocalReference AST.i32 (mkName identifier)
+kPrimaryToOperand (KLiteral literal) = kLiteralToLOperand literal
+  where
+    kLiteralToLOperand (KDecimalConst x) = ConstantOperand (C.Int 32 (toInteger x))
+    kLiteralToLOperand (KDoubleConst x) = ConstantOperand (C.Float (F.Single (realToFrac x)))
 
-kLiteralToLOperand :: KLiteral -> Operand
-kLiteralToLOperand (KDecimalConst x) = ConstantOperand (C.Int 32 (toInteger x))
-kLiteralToLOperand (KDoubleConst x) = ConstantOperand (C.Float (F.Single (realToFrac x)))
+getFirstBinOp :: KExpression -> KBinOp
+getFirstBinOp (KExpression _ ((binOp, _):_)) = binOp
 
 binOpConvert :: KBinOp -> Operand -> Operand -> InstructionMetadata -> Instruction
 binOpConvert KBinOpLess = AST.Sub False False
