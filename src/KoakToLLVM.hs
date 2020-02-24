@@ -13,7 +13,15 @@ import           LLVM.AST.Global
 import           LLVM.AST.Type              as AST
 
 koakToLLVM :: KStmt -> [Definition]
-koakToLLVM (KStmt defs) = map kDefToGlobalDef defs
+koakToLLVM (KStmt defs) = kExpressionsToMain (unsafeKDefsToKExpressions expressions) : map kDefToGlobalDef definitions
+  where
+    expressions = filter isKExpressions defs
+    definitions = filter (not . isKExpressions) defs
+
+    unsafeKDefsToKExpressions = map (\(KExpressions exprs) -> exprs)
+
+    isKExpressions (KExpressions _) = True
+    isKExpressions _ = False
 
 kCallToLLVMCall :: KPostfix -> Instruction
 kCallToLLVMCall (KFuncCall (KIdentifier identifier) (KCallExpr params)) =
@@ -34,6 +42,16 @@ kCallToLLVMCall (KFuncCall (KIdentifier identifier) (KCallExpr params)) =
 
 exprToFirstOperand :: KExpression -> Operand
 exprToFirstOperand = kPrimaryToOperand . getFirstKPrimary
+
+kExpressionsToMain :: [KExpressions] -> Definition
+kExpressionsToMain expressions = 
+    GlobalDefinition
+        functionDefaults
+            { name = mkName "main"
+            , parameters = ([], False)
+            , returnType = AST.i32
+            , basicBlocks = concatMap (\(KListExpr exprs) -> map kExpressionToBasicBlock exprs) expressions
+            }
 
 kDefToGlobalDef :: KDefs -> Definition
 kDefToGlobalDef (KDefs (KPrototype funcName (KPrototypeArgs params KIntType)) (KListExpr exprs)) =
