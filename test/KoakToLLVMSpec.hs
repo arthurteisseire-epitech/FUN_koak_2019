@@ -30,8 +30,8 @@ spec = do
             `shouldBe`
             BasicBlock
                 (Name "entry")
-                [Name "res" := AST.Sub False False (ConstantOperand (C.Int 32 1)) (ConstantOperand (C.Int 32 2)) []]
-                (Do $ Ret (Just $ LocalReference AST.i32 (Name "res")) [])
+                [UnName 0 := AST.Sub False False (ConstantOperand (C.Int 32 1)) (ConstantOperand (C.Int 32 2)) []]
+                (Do $ Ret (Just $ LocalReference AST.i32 (UnName 0)) [])
     describe "function definition" $ do
         it "test function main definition" $
             kDefToGlobalDef
@@ -51,10 +51,10 @@ spec = do
                     , basicBlocks =
                           [ BasicBlock
                                 (Name "entry")
-                                [ Name "res" :=
+                                [ UnName 0 :=
                                   AST.Sub False False (ConstantOperand (C.Int 32 44)) (ConstantOperand (C.Int 32 2)) []
                                 ]
-                                (Do $ Ret (Just $ LocalReference AST.i32 (Name "res")) [])
+                                (Do $ Ret (Just $ LocalReference AST.i32 (UnName 0)) [])
                           ]
                     }
         it "test function with args" $
@@ -77,7 +77,7 @@ spec = do
                     , basicBlocks =
                           [ BasicBlock
                                 (Name "entry")
-                                [ Name "res" :=
+                                [ UnName 0 :=
                                   AST.Sub
                                       False
                                       False
@@ -85,7 +85,7 @@ spec = do
                                       (LocalReference AST.i32 (Name "b"))
                                       []
                                 ]
-                                (Do $ Ret (Just $ LocalReference AST.i32 (Name "res")) [])
+                                (Do $ Ret (Just $ LocalReference AST.i32 (UnName 0)) [])
                           ]
                     }
     describe "call function" $ do
@@ -150,7 +150,7 @@ spec = do
                     , basicBlocks =
                           [ BasicBlock
                                 (Name "entry")
-                                [ Name "res" :=
+                                [ UnName 0 :=
                                   AST.Sub
                                       False
                                       False
@@ -158,10 +158,10 @@ spec = do
                                       (ConstantOperand $ C.Int 32 4)
                                       []
                                 ]
-                                (Do $ Ret (Just $ LocalReference AST.i32 (Name "res")) [])
+                                (Do $ Ret (Just $ LocalReference AST.i32 (UnName 0)) [])
                           , BasicBlock
                                (Name "entry")
-                               [ Name "res" :=
+                               [ UnName 0 :=
                                  AST.Sub
                                      False
                                      False
@@ -169,7 +169,7 @@ spec = do
                                      (ConstantOperand $ C.Int 32 4)
                                      []
                                ]
-                               (Do $ Ret (Just $ LocalReference AST.i32 (Name "res")) [])
+                               (Do $ Ret (Just $ LocalReference AST.i32 (UnName 0)) [])
                           ]
                     }
             ]
@@ -235,7 +235,7 @@ spec = do
                   , basicBlocks =
                         [ BasicBlock
                               (Name "entry")
-                              [ Name "res" :=
+                              [ UnName 0 :=
                                 AST.Add
                                     False
                                     False
@@ -243,7 +243,7 @@ spec = do
                                     (LocalReference AST.i32 (Name "y"))
                                     []
                               ]
-                              (Do $ Ret (Just $ LocalReference AST.i32 (Name "res")) [])
+                              (Do $ Ret (Just $ LocalReference AST.i32 (UnName 0)) [])
                         ]
                   }
         ]
