@@ -1,8 +1,8 @@
 module ParseUtils where
 
-import           Control.Applicative          ((<|>), liftA2)
-import           Data.Char
-import           Text.ParserCombinators.ReadP
+import Control.Applicative ((<|>), liftA2)
+import Data.Char
+import Text.ParserCombinators.ReadP
 
 checkParseDouble :: ReadP String
 checkParseDouble = checkParseInt <++> decimalPart
@@ -32,13 +32,13 @@ oneOf s = satisfy (`elem` s)
 
 sepByPair :: ReadP a -> ReadP sep -> ReadP (a, [(sep, a)])
 sepByPair parser sep = do
-    p <- parser
-    h <- sepByPairHelper parser sep <|> return []
-    return (p, h)
+  p <- parser
+  h <- sepByPairHelper parser sep <|> return []
+  return (p, h)
 
 sepByPairHelper :: ReadP a -> ReadP sep -> ReadP [(sep, a)]
 sepByPairHelper parser sep = do
-    s <- sep
-    p <- parser
-    e <- sepByPairHelper parser sep <|> return []
-    return $ (s, p) : e
+  s <- sep
+  p <- parser
+  e <- sepByPairHelper parser sep <|> return []
+  return $ (s, p) : e

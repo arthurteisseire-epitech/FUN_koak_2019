@@ -2,19 +2,15 @@
 
 module Main where
 
-import           LLVM.AST              as AST
-
-import           LLVM.Context
-import           LLVM.Module
-
+import Control.Monad ((>=>))
 import qualified Data.ByteString.Char8 as BS
-
-import           System.Environment
-import           System.Exit
-
-import           Control.Monad ((>=>))
-import           KoakToLLVM (koakToLLVM)
-import           Parser (parseKoak)
+import KoakToLLVM (koakToLLVM)
+import LLVM.AST as AST
+import LLVM.Context
+import LLVM.Module
+import Parser (parseKoak)
+import System.Environment
+import System.Exit
 
 main :: IO ()
 main = getArgs >>= mapM_ printLLVMFromFilename
