@@ -85,11 +85,11 @@ kExpressionToBasicBlock (KExpression firstPostfix (x:xs)) =
     BasicBlock
         (Name "entry")
         ((UnName 0 := arithmetic (fst x) (postfixToOperand firstPostfix) (postfixToOperand $ snd x) []) :
-         zipWith binOpUnaryPairToNamedInstruction [0 ..] xs)
+         zipWith mkInstructionFromPair [0..] xs)
         (Do $ Ret (Just $ LocalReference AST.i32 (UnName $ fromIntegral $ length xs)) [])
 
-binOpUnaryPairToNamedInstruction :: Word -> (KBinOp, KPostfix) -> Named Instruction
-binOpUnaryPairToNamedInstruction idx (binOp, postfix) =
+mkInstructionFromPair :: Word -> (KBinOp, KPostfix) -> Named Instruction
+mkInstructionFromPair idx (binOp, postfix) =
     UnName (idx + 1) := arithmetic binOp (LocalReference AST.i32 $ UnName idx) (postfixToOperand postfix) []
 
 postfixToOperand :: KPostfix -> Operand
