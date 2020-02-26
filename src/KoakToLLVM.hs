@@ -39,9 +39,7 @@ kCallToLLVMCall (KFuncCall (KIdentifier identifier) (KCallExpr params)) =
         []
   where
     getReturnTypes = map (const AST.i32) params
-
-exprToFirstOperand :: KExpression -> Operand
-exprToFirstOperand = postfixToOperand . getFirstPostfix
+    exprToFirstOperand (KExpression (KPostfix postfix) _) = postfixToOperand postfix
 
 kExpressionsToMain :: [KExpressions] -> Definition
 kExpressionsToMain expressions = 
@@ -70,12 +68,11 @@ kReturnTypeToLReturnType :: KType -> Type
 kReturnTypeToLReturnType KIntType = AST.i32
 
 kExpressionToBasicBlock :: KExpression -> BasicBlock
-kExpressionToBasicBlock expr@(KExpression (KPostfix (KPrimary _)) []) =
+kExpressionToBasicBlock expr@(KExpression (KPostfix firstPostfix@(KPrimary _)) []) =
     BasicBlock
         (Name "entry")
         []
-        (Do $ Ret (Just
-            ((postfixToOperand . getFirstPostfix) expr)) [])
+        (Do $ Ret (Just $ postfixToOperand firstPostfix) [])
 
 kExpressionToBasicBlock (KExpression (KPostfix call@(KFuncCall _ _)) _) =
     BasicBlock
@@ -84,26 +81,18 @@ kExpressionToBasicBlock (KExpression (KPostfix call@(KFuncCall _ _)) _) =
         (Do $ Ret (Just $
             LocalReference AST.i32 (Name "callRes")) [])
 
-kExpressionToBasicBlock expr@(KExpression firstUnary pairs) =
+kExpressionToBasicBlock (KExpression (KPostfix firstPostfix) (x:xs)) =
     BasicBlock
         (Name "entry")
-        ((UnName 0 :=
-          (binOpConvert . getFirstBinOp)
-              expr
-              ((postfixToOperand . getFirstPostfix) expr)
-              ((postfixToOperand . getSecondPostfix) expr)
-              []) : zipWith binOpUnaryPairToNamedInstruction [0..] (tail pairs))
-        (Do $ Ret (Just $ LocalReference AST.i32 (UnName . fromIntegral $ length pairs - 1)) [])
+        ((UnName 0 := arithmetic (fst x) (postfixToOperand firstPostfix) (postfixToOperand $ pairToPostfix x) []) :
+         zipWith binOpUnaryPairToNamedInstruction [0 ..] xs)
+        (Do $ Ret (Just $ LocalReference AST.i32 (UnName $ fromIntegral $ length xs)) [])
+  where
+    pairToPostfix (_, KPostfix postfix) = postfix
 
 binOpUnaryPairToNamedInstruction :: Word -> (KBinOp, KUnary) -> Named Instruction
 binOpUnaryPairToNamedInstruction idx (binOp, KPostfix postfix) =
-    UnName (idx + 1) := binOpConvert binOp (LocalReference AST.i32 (UnName idx)) (postfixToOperand postfix) []
-
-getFirstPostfix :: KExpression -> KPostfix
-getFirstPostfix (KExpression (KPostfix postfix) _) = postfix
-
-getSecondPostfix :: KExpression -> KPostfix
-getSecondPostfix (KExpression _ ((_, KPostfix postfix):_)) = postfix
+    UnName (idx + 1) := arithmetic binOp (LocalReference AST.i32 $ UnName idx) (postfixToOperand postfix) []
 
 postfixToOperand :: KPostfix -> Operand
 postfixToOperand (KPrimary (KIdentifier identifier)) = LocalReference AST.i32 (mkName identifier)
@@ -115,8 +104,8 @@ postfixToOperand (KPrimary (KLiteral literal)) = kLiteralToLOperand literal
 getFirstBinOp :: KExpression -> KBinOp
 getFirstBinOp (KExpression _ ((binOp, _):_)) = binOp
 
-binOpConvert :: KBinOp -> Operand -> Operand -> InstructionMetadata -> Instruction
-binOpConvert KBinOpLess = AST.Sub False False
-binOpConvert KBinOpPlus = AST.Add False False
-binOpConvert KBinOpMul  = AST.Mul False False
-binOpConvert KBinOpDiv  = AST.SDiv False
+arithmetic :: KBinOp -> Operand -> Operand -> InstructionMetadata -> Instruction
+arithmetic KBinOpLess = AST.Sub False False
+arithmetic KBinOpPlus = AST.Add False False
+arithmetic KBinOpMul  = AST.Mul False False
+arithmetic KBinOpDiv  = AST.SDiv False
