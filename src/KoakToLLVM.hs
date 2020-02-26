@@ -87,18 +87,17 @@ kExpressionToBasicBlock (KExpression (KPostfix call@(KFuncCall _ _)) _) =
 kExpressionToBasicBlock expr@(KExpression firstUnary pairs) =
     BasicBlock
         (Name "entry")
-        ([ UnName 0 :=
+        ((UnName 0 :=
           (binOpConvert . getFirstBinOp)
               expr
               ((kPrimaryToOperand . getFirstKPrimary) expr)
               ((kPrimaryToOperand . getSecondKPrimary) expr)
-              []
-        ] ++ map binOpUnaryPairToNamedInstruction (zip [0..] (tail pairs)))
+              []) : zipWith binOpUnaryPairToNamedInstruction [0..] (tail pairs))
         (Do $ Ret (Just $ LocalReference AST.i32 (UnName . fromIntegral $ length pairs - 1)) [])
 
-binOpUnaryPairToNamedInstruction :: (Word, (KBinOp, KUnary)) -> Named Instruction
-binOpUnaryPairToNamedInstruction (idx, (binOp, (KPostfix (KPrimary primary)))) =
-    UnName (idx + 1) := (binOpConvert binOp) (LocalReference AST.i32 (UnName idx)) (kPrimaryToOperand primary) []
+binOpUnaryPairToNamedInstruction :: Word -> (KBinOp, KUnary) -> Named Instruction
+binOpUnaryPairToNamedInstruction idx (binOp, KPostfix (KPrimary primary)) =
+    UnName (idx + 1) := binOpConvert binOp (LocalReference AST.i32 (UnName idx)) (kPrimaryToOperand primary) []
 
 getFirstKPrimary :: KExpression -> KPrimary
 getFirstKPrimary (KExpression (KPostfix (KPrimary primary)) _) = primary
