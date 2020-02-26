@@ -45,12 +45,7 @@ data KExpressions
     deriving (Show, Eq)
 
 data KExpression =
-    KExpression KUnary [(KBinOp, KUnary)]
-    deriving (Show, Eq)
-
-data KUnary
-    = KUnOpUnary KUnOp KUnary
-    | KPostfix KPostfix
+    KExpression KPostfix [(KBinOp, KPostfix)]
     deriving (Show, Eq)
 
 data KPostfix
@@ -86,11 +81,6 @@ data KBinOp
     | KBinOpDiv
     | KBinOpInf
     | KBinOpAssign
-    deriving (Show, Eq)
-
-data KUnOp
-    = KUnOpNot
-    | KUnOpLess
     deriving (Show, Eq)
 
 type KIdentifier = String

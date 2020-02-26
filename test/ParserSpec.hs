@@ -1,6 +1,5 @@
 module ParserSpec where
 
-import           Data.Either
 import           KoakAST
 import           Parser
 import           Test.Hspec
@@ -18,16 +17,16 @@ spec =
                      [ KExpressions $
                        KListExpr
                            [ KExpression
-                                 ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1)
-                                 [ (KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
-                                 , (KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 3)
+                                 ((KPrimary . KLiteral . KDecimalConst) 1)
+                                 [ (KBinOpLess, (KPrimary . KLiteral . KDecimalConst) 2)
+                                 , (KBinOpLess, (KPrimary . KLiteral . KDecimalConst) 3)
                                  ]
                            ]
                      , KExpressions $
                        KListExpr
                            [ KExpression
-                                 ((KPostfix . KPrimary . KIdentifier) "num1")
-                                 [(KBinOpDiv, (KPostfix . KPrimary . KIdentifier) "num2")]
+                                 ((KPrimary . KIdentifier) "num1")
+                                 [(KBinOpDiv, (KPrimary . KIdentifier) "num2")]
                            ]
                      ])
         it "test definition" $
@@ -40,8 +39,8 @@ spec =
                                 (KPrototypeArgs [KPrototypeArg "num1" KIntType, KPrototypeArg "num2" KIntType] KIntType))
                            (KListExpr
                                 [ KExpression
-                                      ((KPostfix . KPrimary . KIdentifier) "num1")
-                                      [(KBinOpPlus, (KPostfix . KPrimary . KIdentifier) "num2")]
+                                      ((KPrimary . KIdentifier) "num1")
+                                      [(KBinOpPlus, (KPrimary . KIdentifier) "num2")]
                                 ])
                      ])
         it "test function call" $
@@ -51,12 +50,11 @@ spec =
                      [ KExpressions $
                        KListExpr
                            [ KExpression
-                                 (KPostfix $
-                                  KFuncCall
+                                 (KFuncCall
                                       (KIdentifier "add")
                                       (KCallExpr
-                                           [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) []
-                                           , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4) []
+                                           [ KExpression ((KPrimary . KLiteral . KDecimalConst) 2) []
+                                           , KExpression ((KPrimary . KLiteral . KDecimalConst) 4) []
                                            ]))
                                  []
                            ]
@@ -68,12 +66,12 @@ spec =
                      [ KExpressions $
                        KIf
                            (KExpression
-                                ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1)
-                                [(KBinOpInf, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)])
+                                ((KPrimary . KLiteral . KDecimalConst) 1)
+                                [(KBinOpInf, (KPrimary . KLiteral . KDecimalConst) 2)])
                            (KListExpr
                                 [ KExpression
-                                      ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1)
-                                      [(KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)]
+                                      ((KPrimary . KLiteral . KDecimalConst) 1)
+                                      [(KBinOpPlus, (KPrimary . KLiteral . KDecimalConst) 2)]
                                 ])
                      ])
         it "test if then else" $
@@ -83,10 +81,10 @@ spec =
                      [ KExpressions $
                        KIfElse
                            (KExpression
-                                ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1)
-                                [(KBinOpInf, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)])
-                           (KListExpr [KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) []])
-                           (KListExpr [KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) []])
+                                ((KPrimary . KLiteral . KDecimalConst) 1)
+                                [(KBinOpInf, (KPrimary . KLiteral . KDecimalConst) 2)])
+                           (KListExpr [KExpression ((KPrimary . KLiteral . KDecimalConst) 1) []])
+                           (KListExpr [KExpression ((KPrimary . KLiteral . KDecimalConst) 2) []])
                      ])
         it "test while" $
             parseKoak "while i<10 do i=i+1;" `shouldBe`
@@ -95,13 +93,13 @@ spec =
                      [ KExpressions $
                        KWhile
                            (KExpression
-                                ((KPostfix . KPrimary . KIdentifier) "i")
-                                [(KBinOpInf, (KPostfix . KPrimary . KLiteral . KDecimalConst) 10)])
+                                ((KPrimary . KIdentifier) "i")
+                                [(KBinOpInf, (KPrimary . KLiteral . KDecimalConst) 10)])
                            (KListExpr
                                 [ KExpression
-                                      ((KPostfix . KPrimary . KIdentifier) "i")
-                                      [ (KBinOpAssign, (KPostfix . KPrimary . KIdentifier) "i")
-                                      , (KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 1)
+                                      ((KPrimary . KIdentifier) "i")
+                                      [ (KBinOpAssign, (KPrimary . KIdentifier) "i")
+                                      , (KBinOpPlus, (KPrimary . KLiteral . KDecimalConst) 1)
                                       ]
                                 ])
                      ])
@@ -112,22 +110,22 @@ spec =
                      [ KExpressions $
                        KFor
                            (KExpression
-                                ((KPostfix . KPrimary . KIdentifier) "i")
-                                [(KBinOpAssign, (KPostfix . KPrimary . KLiteral . KDecimalConst) 0)])
+                                ((KPrimary . KIdentifier) "i")
+                                [(KBinOpAssign, (KPrimary . KLiteral . KDecimalConst) 0)])
                            (KExpression
-                                ((KPostfix . KPrimary . KIdentifier) "i")
-                                [(KBinOpInf, (KPostfix . KPrimary . KLiteral . KDecimalConst) 10)])
+                                ((KPrimary . KIdentifier) "i")
+                                [(KBinOpInf, (KPrimary . KLiteral . KDecimalConst) 10)])
                            (KExpression
-                                ((KPostfix . KPrimary . KIdentifier) "i")
-                                [ (KBinOpAssign, (KPostfix . KPrimary . KIdentifier) "i")
-                                , (KBinOpPlus, (KPostfix . KPrimary . KLiteral . KDecimalConst) 1)
+                                ((KPrimary . KIdentifier) "i")
+                                [ (KBinOpAssign, (KPrimary . KIdentifier) "i")
+                                , (KBinOpPlus, (KPrimary . KLiteral . KDecimalConst) 1)
                                 ])
                            (KListExpr
                                 [ KExpression
-                                      ((KPostfix . KPrimary . KIdentifier) "res")
-                                      [ (KBinOpAssign, (KPostfix . KPrimary . KIdentifier) "res")
-                                      , (KBinOpPlus, (KPostfix . KPrimary . KIdentifier) "i")
-                                      , (KBinOpMul, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)
+                                      ((KPrimary . KIdentifier) "res")
+                                      [ (KBinOpAssign, (KPrimary . KIdentifier) "res")
+                                      , (KBinOpPlus, (KPrimary . KIdentifier) "i")
+                                      , (KBinOpMul, (KPrimary . KLiteral . KDecimalConst) 2)
                                       ]
                                 ])
                      ])

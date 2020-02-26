@@ -23,7 +23,7 @@ findFuncCalls (KStmt defs) = concatMap findFuncCallsFromExpressions (mapMaybe ge
     findFuncCallsFromExpressions (KListExpr exprs) = mapMaybe extractFuncCall exprs
     getExpressions (KExpressions exprs) = return exprs
     getExpressions _                    = Nothing
-    extractFuncCall (KExpression (KPostfix (KFuncCall identifier args)) []) = return $ KFuncCall identifier args
+    extractFuncCall (KExpression (KFuncCall identifier args) []) = return $ KFuncCall identifier args
     extractFuncCall _ = Nothing
 
 findPrototypes :: KStmt -> [KPrototype]

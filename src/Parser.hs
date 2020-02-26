@@ -107,14 +107,8 @@ parseListExpr = KListExpr <$> sepBy1 parseExpression (char ':')
 
 parseExpression :: ReadP KExpression
 parseExpression = do
-    (u, m) <- sepByPair parseUnary parseBinOp
+    (u, m) <- sepByPair parsePostfix parseBinOp
     return (KExpression u m)
-
-parseUnary :: ReadP KUnary
-parseUnary =
-    (do u <- parseUnOp
-        KUnOpUnary u <$> parseUnary) <|>
-    (KPostfix <$> parsePostfix)
 
 parsePostfix :: ReadP KPostfix
 parsePostfix = do
@@ -148,6 +142,3 @@ parseBinOp =
     (string "/" >> return KBinOpDiv) <|>
     (string "<" >> return KBinOpInf) <|>
     (string "=" >> return KBinOpAssign)
-
-parseUnOp :: ReadP KUnOp
-parseUnOp = (string "!" >> return KUnOpNot) <|> (string "-" >> return KUnOpLess)

@@ -20,14 +20,13 @@ spec :: Spec
 spec = do
     describe "expression to BasicBlock" $ do
         it "test 1" $
-            kExpressionToBasicBlock (KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1) []) `shouldBe`
+            kExpressionToBasicBlock (KExpression ((KPrimary . KLiteral . KDecimalConst) 1) []) `shouldBe`
             BasicBlock (Name "entry") [] (Do $ Ret (Just $ ConstantOperand (C.Int 32 1)) [])
         it "test 1-2" $
             kExpressionToBasicBlock
                 (KExpression
-                     ((KPostfix . KPrimary . KLiteral . KDecimalConst) 1)
-                     [(KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)]) 
-            `shouldBe`
+                     ((KPrimary . KLiteral . KDecimalConst) 1)
+                     [(KBinOpLess, (KPrimary . KLiteral . KDecimalConst) 2)]) `shouldBe`
             BasicBlock
                 (Name "entry")
                 [UnName 0 := AST.Sub False False (ConstantOperand (C.Int 32 1)) (ConstantOperand (C.Int 32 2)) []]
@@ -39,10 +38,9 @@ spec = do
                      (KPrototype "main" (KPrototypeArgs [] KIntType))
                      (KListExpr
                           [ KExpression
-                                ((KPostfix . KPrimary . KLiteral . KDecimalConst) 44)
-                                [(KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 2)]
-                          ])) 
-            `shouldBe`
+                                ((KPrimary . KLiteral . KDecimalConst) 44)
+                                [(KBinOpLess, (KPrimary . KLiteral . KDecimalConst) 2)]
+                          ])) `shouldBe`
             GlobalDefinition
                 functionDefaults
                     { name = Name "main"
@@ -64,11 +62,7 @@ spec = do
                           "sub"
                           (KPrototypeArgs [KPrototypeArg "a" KIntType, KPrototypeArg "b" KIntType] KIntType))
                      (KListExpr
-                          [ KExpression
-                                ((KPostfix . KPrimary . KIdentifier) "a")
-                                [(KBinOpLess, (KPostfix . KPrimary . KIdentifier) "b")]
-                          ])) 
-            `shouldBe`
+                          [KExpression ((KPrimary . KIdentifier) "a") [(KBinOpLess, (KPrimary . KIdentifier) "b")]])) `shouldBe`
             GlobalDefinition
                 functionDefaults
                     { name = Name "sub"
@@ -90,8 +84,7 @@ spec = do
                     }
     describe "call function" $ do
         it "test call function without args" $
-            kCallToLLVMCall (KFuncCall (KIdentifier "ret1") (KCallExpr [])) 
-            `shouldBe`
+            kCallToLLVMCall (KFuncCall (KIdentifier "ret1") (KCallExpr [])) `shouldBe`
             AST.Call
                 Nothing
                 AST.C
@@ -109,10 +102,9 @@ spec = do
                 (KFuncCall
                      (KIdentifier "add")
                      (KCallExpr
-                          [ KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 2) []
-                          , KExpression ((KPostfix . KPrimary . KLiteral . KDecimalConst) 4) []
-                          ])) 
-            `shouldBe`
+                          [ KExpression ((KPrimary . KLiteral . KDecimalConst) 2) []
+                          , KExpression ((KPrimary . KLiteral . KDecimalConst) 4) []
+                          ])) `shouldBe`
             AST.Call
                 Nothing
                 AST.C
@@ -127,52 +119,42 @@ spec = do
                 []
     describe "expressions to llvm main" $
         it "test that expressions are in llvm main" $
-            koakToLLVM
-                (KStmt [ KExpressions
-                            (KListExpr
-                                  [ KExpression
-                                      ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3)
-                                      [(KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 4)]
-                                  ])
-                       , KExpressions
-                             (KListExpr
-                                   [ KExpression
-                                       ((KPostfix . KPrimary . KLiteral . KDecimalConst) 3)
-                                       [(KBinOpLess, (KPostfix . KPrimary . KLiteral . KDecimalConst) 4)]
-                                   ])
-                       ])
-            `shouldBe`
-            [ GlobalDefinition
-                functionDefaults
-                    { name = Name "main"
-                    , parameters = ([], False)
-                    , returnType = AST.i32
-                    , basicBlocks =
-                          [ BasicBlock
-                                (Name "entry")
-                                [ UnName 0 :=
-                                  AST.Sub
-                                      False
-                                      False
-                                      (ConstantOperand $ C.Int 32 3)
-                                      (ConstantOperand $ C.Int 32 4)
-                                      []
-                                ]
-                                (Do $ Ret (Just $ LocalReference AST.i32 (UnName 0)) [])
-                          , BasicBlock
-                               (Name "entry")
-                               [ UnName 0 :=
-                                 AST.Sub
-                                     False
-                                     False
-                                     (ConstantOperand $ C.Int 32 3)
-                                     (ConstantOperand $ C.Int 32 4)
-                                     []
-                               ]
-                               (Do $ Ret (Just $ LocalReference AST.i32 (UnName 0)) [])
-                          ]
-                    }
-            ]
+        koakToLLVM
+            (KStmt
+                 [ KExpressions
+                       (KListExpr
+                            [ KExpression
+                                  ((KPrimary . KLiteral . KDecimalConst) 3)
+                                  [(KBinOpLess, (KPrimary . KLiteral . KDecimalConst) 4)]
+                            ])
+                 , KExpressions
+                       (KListExpr
+                            [ KExpression
+                                  ((KPrimary . KLiteral . KDecimalConst) 3)
+                                  [(KBinOpLess, (KPrimary . KLiteral . KDecimalConst) 4)]
+                            ])
+                 ]) `shouldBe`
+        [ GlobalDefinition
+              functionDefaults
+                  { name = Name "main"
+                  , parameters = ([], False)
+                  , returnType = AST.i32
+                  , basicBlocks =
+                        [ BasicBlock
+                              (Name "entry")
+                              [ UnName 0 :=
+                                AST.Sub False False (ConstantOperand $ C.Int 32 3) (ConstantOperand $ C.Int 32 4) []
+                              ]
+                              (Do $ Ret (Just $ LocalReference AST.i32 (UnName 0)) [])
+                        , BasicBlock
+                              (Name "entry")
+                              [ UnName 0 :=
+                                AST.Sub False False (ConstantOperand $ C.Int 32 3) (ConstantOperand $ C.Int 32 4) []
+                              ]
+                              (Do $ Ret (Just $ LocalReference AST.i32 (UnName 0)) [])
+                        ]
+                  }
+        ]
     describe "function definition calling an other one" $
         it "test call function with args from main" $
         koakToLLVM
@@ -183,23 +165,21 @@ spec = do
                             (KPrototypeArgs [KPrototypeArg "x" KIntType, KPrototypeArg "y" KIntType] KIntType))
                        (KListExpr
                             [ KExpression
-                                  (KPostfix (KPrimary (KIdentifier "x")))
-                                  [(KBinOpPlus, KPostfix (KPrimary (KIdentifier "y")))]
+                                  (KPrimary (KIdentifier "x"))
+                                  [(KBinOpPlus, (KPrimary . KIdentifier) "y")]
                             ])
                  , KExpressions
                        (KListExpr
                             [ KExpression
-                                  (KPostfix
-                                       (KFuncCall
-                                            (KIdentifier "add")
-                                            (KCallExpr
-                                                 [ KExpression (KPostfix (KPrimary (KLiteral (KDecimalConst 3)))) []
-                                                 , KExpression (KPostfix (KPrimary (KLiteral (KDecimalConst 4)))) []
-                                                 ])))
+                                   (KFuncCall
+                                        (KIdentifier "add")
+                                        (KCallExpr
+                                             [ KExpression ((KPrimary . KLiteral . KDecimalConst) 3) []
+                                             , KExpression ((KPrimary . KLiteral . KDecimalConst) 4) []
+                                             ]))
                                   []
                             ])
-                 ]) 
-        `shouldBe`
+                 ]) `shouldBe`
         [ GlobalDefinition
               functionDefaults
                   { name = Name "main"
