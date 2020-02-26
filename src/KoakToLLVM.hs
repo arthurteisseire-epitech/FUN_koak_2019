@@ -99,9 +99,6 @@ postfixToOperand (KPrimary (KLiteral literal)) = kLiteralToLOperand literal
     kLiteralToLOperand (KDecimalConst x) = ConstantOperand (C.Int 32 (toInteger x))
     kLiteralToLOperand (KDoubleConst x) = ConstantOperand (C.Float (F.Single (realToFrac x)))
 
-getFirstBinOp :: KExpression -> KBinOp
-getFirstBinOp (KExpression _ ((binOp, _):_)) = binOp
-
 arithmetic :: KBinOp -> Operand -> Operand -> InstructionMetadata -> Instruction
 arithmetic KBinOpLess = AST.Sub False False
 arithmetic KBinOpPlus = AST.Add False False
