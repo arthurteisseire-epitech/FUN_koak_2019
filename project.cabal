@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f42212c8fed64f15392072135d88385111a89b398b465fdec3475bfb068034b2
+-- hash: 2de0bd93106541852abe956503062d427bf9a67300e5112a57c91c971c7cdcc1
 
 name:           project
 version:        0.1.0.0
@@ -27,13 +27,8 @@ source-repository head
 
 library
   exposed-modules:
-      CheckKoakAST
       KoakAST
       KoakToLLVM
-      LLVMFuncTest
-      LLVMTest
-      LLVMTestMain
-      LLVMTestOp
       Parser
       ParseUtils
   other-modules:
@@ -67,10 +62,8 @@ test-suite project-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      CheckKoakASTSpec
       KoakToLLVMSpec
       ParserSpec
-      TestSpec
       Paths_project
   hs-source-dirs:
       test

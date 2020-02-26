@@ -68,7 +68,7 @@ kReturnTypeToLReturnType :: KType -> Type
 kReturnTypeToLReturnType KIntType = AST.i32
 
 kExpressionToBasicBlock :: KExpression -> BasicBlock
-kExpressionToBasicBlock expr@(KExpression firstPostfix@(KPrimary _) []) =
+kExpressionToBasicBlock (KExpression firstPostfix@(KPrimary _) []) =
     BasicBlock
         (Name "entry")
         []
@@ -97,7 +97,7 @@ postfixToOperand (KPrimary (KIdentifier identifier)) = LocalReference AST.i32 (m
 postfixToOperand (KPrimary (KLiteral literal)) = kLiteralToLOperand literal
   where
     kLiteralToLOperand (KDecimalConst x) = ConstantOperand (C.Int 32 (toInteger x))
-    kLiteralToLOperand (KDoubleConst x) = ConstantOperand (C.Float (F.Single (realToFrac x)))
+    kLiteralToLOperand (KDoubleConst x) = ConstantOperand (C.Float $ F.Single (realToFrac x))
 
 arithmetic :: KBinOp -> Operand -> Operand -> InstructionMetadata -> Instruction
 arithmetic KBinOpLess = AST.Sub False False
