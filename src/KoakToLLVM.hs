@@ -41,7 +41,7 @@ kCallToLLVMCall (KFuncCall (KIdentifier identifier) (KCallExpr params)) =
     getReturnTypes = map (const AST.i32) params
 
 exprToFirstOperand :: KExpression -> Operand
-exprToFirstOperand = kPrimaryToOperand . getFirstKPrimary
+exprToFirstOperand = postfixToOperand . getFirstPostfix
 
 kExpressionsToMain :: [KExpressions] -> Definition
 kExpressionsToMain expressions = 
@@ -75,7 +75,7 @@ kExpressionToBasicBlock expr@(KExpression (KPostfix (KPrimary _)) []) =
         (Name "entry")
         []
         (Do $ Ret (Just
-            ((kPrimaryToOperand . getFirstKPrimary) expr)) [])
+            ((postfixToOperand . getFirstPostfix) expr)) [])
 
 kExpressionToBasicBlock (KExpression (KPostfix call@(KFuncCall _ _)) _) =
     BasicBlock
@@ -90,24 +90,24 @@ kExpressionToBasicBlock expr@(KExpression firstUnary pairs) =
         ((UnName 0 :=
           (binOpConvert . getFirstBinOp)
               expr
-              ((kPrimaryToOperand . getFirstKPrimary) expr)
-              ((kPrimaryToOperand . getSecondKPrimary) expr)
+              ((postfixToOperand . getFirstPostfix) expr)
+              ((postfixToOperand . getSecondPostfix) expr)
               []) : zipWith binOpUnaryPairToNamedInstruction [0..] (tail pairs))
         (Do $ Ret (Just $ LocalReference AST.i32 (UnName . fromIntegral $ length pairs - 1)) [])
 
 binOpUnaryPairToNamedInstruction :: Word -> (KBinOp, KUnary) -> Named Instruction
-binOpUnaryPairToNamedInstruction idx (binOp, KPostfix (KPrimary primary)) =
-    UnName (idx + 1) := binOpConvert binOp (LocalReference AST.i32 (UnName idx)) (kPrimaryToOperand primary) []
+binOpUnaryPairToNamedInstruction idx (binOp, KPostfix postfix) =
+    UnName (idx + 1) := binOpConvert binOp (LocalReference AST.i32 (UnName idx)) (postfixToOperand postfix) []
 
-getFirstKPrimary :: KExpression -> KPrimary
-getFirstKPrimary (KExpression (KPostfix (KPrimary primary)) _) = primary
+getFirstPostfix :: KExpression -> KPostfix
+getFirstPostfix (KExpression (KPostfix postfix) _) = postfix
 
-getSecondKPrimary :: KExpression -> KPrimary
-getSecondKPrimary (KExpression _ ((_, KPostfix (KPrimary primary)):_)) = primary
+getSecondPostfix :: KExpression -> KPostfix
+getSecondPostfix (KExpression _ ((_, KPostfix postfix):_)) = postfix
 
-kPrimaryToOperand :: KPrimary -> Operand
-kPrimaryToOperand (KIdentifier identifier) = LocalReference AST.i32 (mkName identifier)
-kPrimaryToOperand (KLiteral literal) = kLiteralToLOperand literal
+postfixToOperand :: KPostfix -> Operand
+postfixToOperand (KPrimary (KIdentifier identifier)) = LocalReference AST.i32 (mkName identifier)
+postfixToOperand (KPrimary (KLiteral literal)) = kLiteralToLOperand literal
   where
     kLiteralToLOperand (KDecimalConst x) = ConstantOperand (C.Int 32 (toInteger x))
     kLiteralToLOperand (KDoubleConst x) = ConstantOperand (C.Float (F.Single (realToFrac x)))
